@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Penghitung Kurs - Konversi Mata Uang Real-time</title>
+  <meta name="description" content="Alat konversi mata uang gratis untuk Indonesia. Konversi Rupiah ke Dollar, Ringgit, Dolar Singapura, dan mata uang dunia lainnya secara real-time." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+    body { background: #0f172a; min-height: 100dvh; }
+    .rate-card { background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+    .sel { border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px 16px; background: #fff; transition: border-color 0.2s; }
+    .sel:focus { border-color: #059669; outline: none; box-shadow: 0 0 0 3px rgba(5,150,105,0.15); }
+    .sel select { -webkit-appearance: none; appearance: none; background: none; }
+    .sel-arrow { pointer-events: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+    .amount-input { border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; font-size: 1.5rem; font-weight: 600; background: #fff; width: 100%; transition: border-color 0.2s; }
+    .amount-input:focus { border-color: #059669; outline: none; box-shadow: 0 0 0 3px rgba(5,150,105,0.15); }
+    .amount-input:disabled { background: #f8fafc; color: #64748b; }
+    .swap-btn { width: 48px; height: 48px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s; border: 1.5px solid #e2e8f0; }
+    .swap-btn:hover { background: #e2e8f0; transform: rotate(180deg); }
+    .swap-btn:active { transform: rotate(180deg) scale(0.92); }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1.5px solid transparent; }
+    .pill:hover { transform: translateY(-1px); }
+    .pill.active { background: #059669; color: #fff; border-color: #059669; }
+    .pill.inactive { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+    .pill.inactive:hover { background: #e2e8f0; border-color: #cbd5e1; }
+    .result-box { background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border: 1.5px solid #a7f3d0; border-radius: 16px; padding: 20px 24px; }
+    .result-amount { font-size: 2rem; font-weight: 700; color: #065f46; line-height: 1.2; }
+    .glow-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .glow-dot.live { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.5); animation: pulse-dot 2s infinite; }
+    @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .loader { width: 20px; height: 20px; border: 2.5px solid #e2e8f0; border-top-color: #059669; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .err-banner { background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 12px 16px; color: #991b1b; font-size: 0.875rem; }
+    .cc { position: relative; }
+    .cc-badge { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+    @media (max-width: 640px) {
+      .rate-card { border-radius: 20px; margin-left: -4px; margin-right: -4px; }
+      .amount-input { font-size: 1.25rem; padding: 14px 16px; }
+      .result-amount { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Nav -->
+  <nav class="flex items-center justify-between px-5 py-4 max-w-5xl mx-auto">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-sm">K</div>
+      <span class="text-white font-semibold text-lg tracking-tight">Penghitung Kurs</span>
+    </div>
+    <a href="#" onclick="event.preventDefault();document.getElementById('howto').scrollIntoView({behavior:'smooth'})" class="text-slate-400 hover:text-white text-sm transition-colors">Panduan</a>
+  </nav>
+
+  <!-- Hero -->
+  <header class="text-center px-4 pt-8 pb-4 max-w-2xl mx-auto">
+    <h1 class="text-white text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]">
+      Konversi Mata Uang<span class="text-emerald-400"> Real-time</span>
+    </h1>
+    <p class="text-slate-400 mt-3 text-base sm:text-lg max-w-lg mx-auto leading-relaxed">
+      Cek kurs Rupiah, Dollar, Ringgit, Dolar Singapura, Euro, Yen, dan puluhan mata uang dunia lainnya. Gratis, real-time, tanpa daftar.
+    </p>
+  </header>
+
+  <!-- Main Converter -->
+  <main class="px-4 pb-16 max-w-2xl mx-auto">
+    <div class="rate-card p-5 sm:p-8">
+      <!-- Status bar -->
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <span class="glow-dot live" id="statusDot"></span>
+          <span class="text-xs text-slate-500 font-medium" id="statusText">Memuat kurs terkini...</span>
+        </div>
+        <button onclick="refreshRates()" id="refreshBtn" class="text-slate-400 hover:text-emerald-600 transition-colors p-1" title="Muat ulang kurs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+        </button>
+      </div>
+
+      <!-- Error banner (hidden by default) -->
+      <div id="errorBanner" class="err-banner mb-4 hidden">
+        <div class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="errorText">Gagal memuat kurs. Menggunakan kurs estimasi.</span>
+        </div>
+      </div>
+
+      <div class="grid gap-5">
+        <!-- AMOUNT -->
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Jumlah</label>
+          <input type="number" id="amount" value="1" min="0" step="any" class="amount-input" inputmode="decimal" oninput="convert()" />
+        </div>
+
+        <!-- FROM CURRENCY -->
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Dari Mata Uang</label>
+          <div class="relative cc">
+            <div class="sel flex items-center gap-3">
+              <span class="cc-badge" id="fromBadge" style="background:#059669;">USD</span>
+              <select id="fromCurrency" class="flex-1 bg-transparent font-semibold text-slate-800 cursor-pointer outline-none text-base" onchange="convert()">
+                <option value="USD" data-symbol="$">USD - Dolar AS</option>
+                <option value="IDR" data-symbol="Rp" selected>IDR - Rupiah Indonesia</option>
+                <option value="SGD">SGD - Dolar Singapura</option>
+                <option value="MYR">MYR - Ringgit Malaysia</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="JPY">JPY - Yen Jepang</option>
+                <option value="GBP">GBP - Poundsterling</option>
+                <option value="AUD">AUD - Dolar Australia</option>
+                <option value="CNY">CNY - Yuan China</option>
+                <option value="KRW">KRW - Won Korea</option>
+                <option value="THB">THB - Baht Thailand</option>
+                <option value="PHP">PHP - Peso Filipina</option>
+                <option value="SAR">SAR - Riyal Saudi</option>
+                <option value="AED">AED - Dirham UAE</option>
+                <option value="HKD">HKD - Dolar Hong Kong</option>
+                <option value="INR">INR - Rupee India</option>
+                <option value="BND">BND - Dolar Brunei</option>
+                <option value="VND">VND - Dong Vietnam</option>
+                <option value="TWD">TWD - Dolar Taiwan</option>
+                <option value="CHF">CHF - Franc Swiss</option>
+                <option value="NZD">NZD - Dolar Selandia Baru</option>
+                <option value="CAD">CAD - Dolar Kanada</option>
+              </select>
+            </div>
+            <span class="sel-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- SWAP BUTTON -->
+        <div class="flex justify-center -my-2">
+          <button onclick="swapCurrencies()" class="swap-btn" title="Tukar mata uang" aria-label="Tukar mata uang">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </button>
+        </div>
+
+        <!-- TO CURRENCY -->
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Ke Mata Uang</label>
+          <div class="relative cc">
+            <div class="sel flex items-center gap-3">
+              <span class="cc-badge" id="toBadge" style="background:#0369a1;">USD</span>
+              <select id="toCurrency" class="flex-1 bg-transparent font-semibold text-slate-800 cursor-pointer outline-none text-base" onchange="convert()">
+                <option value="USD" data-symbol="$" selected>USD - Dolar AS</option>
+                <option value="IDR" data-symbol="Rp">IDR - Rupiah Indonesia</option>
+                <option value="SGD">SGD - Dolar Singapura</option>
+                <option value="MYR">MYR - Ringgit Malaysia</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="JPY">JPY - Yen Jepang</option>
+                <option value="GBP">GBP - Poundsterling</option>
+                <option value="AUD">AUD - Dolar Australia</option>
+                <option value="CNY">CNY - Yuan China</option>
+                <option value="KRW">KRW - Won Korea</option>
+                <option value="THB">THB - Baht Thailand</option>
+                <option value="PHP">PHP - Peso Filipina</option>
+                <option value="SAR">SAR - Riyal Saudi</option>
+                <option value="AED">AED - Dirham UAE</option>
+                <option value="HKD">HKD - Dolar Hong Kong</option>
+                <option value="INR">INR - Rupee India</option>
+                <option value="BND">BND - Dolar Brunei</option>
+                <option value="VND">VND - Dong Vietnam</option>
+                <option value="TWD">TWD - Dolar Taiwan</option>
+                <option value="CHF">CHF - Franc Swiss</option>
+                <option value="NZD">NZD - Dolar Selandia Baru</option>
+                <option value="CAD">CAD - Dolar Kanada</option>
+              </select>
+            </div>
+            <span class="sel-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- RESULT -->
+        <div id="resultContainer" class="result-box mt-1">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs text-emerald-700 font-medium mb-0.5">Hasil Konversi</div>
+              <div class="result-amount" id="resultDisplay">
+                <span id="resultAmount">1,00</span>
+                <span id="resultCode" class="text-base font-semibold ml-1">USD</span>
+              </div>
+              <div class="text-xs text-emerald-600/70 mt-0.5" id="rateDisplay">
+                1 IDR = 0,000062 USD
+              </div>
+            </div>
+            <div id="loadingSpinner" class="hidden">
+              <span class="loader"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- POPULAR PAIRS -->
+        <div class="mt-1">
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2.5 block">Pasangan Populer</label>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="setPair('IDR','USD')" class="pill inactive">IDR &rarr; USD</button>
+            <button onclick="setPair('USD','IDR')" class="pill inactive">USD &rarr; IDR</button>
+            <button onclick="setPair('SGD','IDR')" class="pill inactive">SGD &rarr; IDR</button>
+            <button onclick="setPair('MYR','IDR')" class="pill inactive">MYR &rarr; IDR</button>
+            <button onclick="setPair('USD','SGD')" class="pill inactive">USD &rarr; SGD</button>
+            <button onclick="setPair('IDR','MYR')" class="pill inactive">IDR &rarr; MYR</button>
+          </div>
+        </div>
+
+        <!-- QUICK AMOUNTS -->
+        <div class="mt-1">
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2.5 block">Jumlah Cepat</label>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="setAmount(1)" class="pill inactive">1</button>
+            <button onclick="setAmount(10)" class="pill inactive">10</button>
+            <button onclick="setAmount(100)" class="pill inactive">100</button>
+            <button onclick="setAmount(1000)" class="pill inactive">1.000</button>
+            <button onclick="setAmount(10000)" class="pill inactive">10.000</button>
+            <button onclick="setAmount(100000)" class="pill inactive">100.000</button>
+            <button onclick="setAmount(1000000)" class="pill inactive">1 Juta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to Use -->
+    <div id="howto" class="mt-10 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 sm:p-8">
+      <h2 class="text-white text-xl font-bold mb-4">Cara Pakai</h2>
+      <ol class="space-y-3 text-slate-300 text-sm leading-relaxed">
+        <li class="flex items-start gap-3">
+          <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
+          <span>Masukkan <strong class="text-white">jumlah uang</strong> yang ingin dikonversi di kolom "Jumlah".</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+          <span>Pilih <strong class="text-white">mata uang asal</strong> (misal: IDR untuk Rupiah) dan <strong class="text-white">mata uang tujuan</strong>.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
+          <span>Hasil konversi muncul <strong class="text-white">otomatis</strong> di kotak hijau. Gunakan tombol <span class="inline-flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span> untuk tukar arah konversi.</span>
+        </li>
+      </ol>
+      <div class="mt-5 pt-4 border-t border-slate-700/50">
+        <h3 class="text-white font-semibold text-sm mb-2">Yang Perlu Diketahui</h3>
+        <ul class="space-y-2 text-slate-400 text-xs leading-relaxed">
+          <li class="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Kurs diperbarui dari <strong class="text-slate-300">Open Exchange Rates</strong> setiap kali halaman dimuat.
+          </li>
+          <li class="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Kurs bisa saja berbeda dengan kurs di bank / money changer karena merupakan kurs pasar menengah (mid-market rate).
+          </li>
+          <li class="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Jika tidak ada koneksi internet, aplikasi akan menggunakan kurs yang tersimpan sebelumnya.
+          </li>
+          <li class="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Semua data diproses di browser kamu. Tidak ada data yang dikirim ke server kami.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-xs text-slate-600 pb-4">
+      <p>Penghitung Kurs &copy; 2026 &mdash; Alat gratis untuk masyarakat Indonesia</p>
+      <p class="mt-1">Dibuat dengan <span class="text-emerald-500">&hearts;</span> untuk kemudahan konversi mata uang sehari-hari</p>
+    </footer>
+  </main>
+
+  <script>
+    // ============================================================
+    //  CORE STATE
+    // ============================================================
+    const CURRENCIES = ['USD','IDR','SGD','MYR','EUR','JPY','GBP','AUD','CNY','KRW','THB','PHP','SAR','AED','HKD','INR','BND','VND','TWD','CHF','NZD','CAD'];
+    const SYMBOLS = { USD:'$', IDR:'Rp', SGD:'S$', MYR:'RM', EUR:'\u20AC', JPY:'\u00A5', GBP:'\u00A3', AUD:'A$', CNY:'\u5143', KRW:'\u20A9', THB:'\u0E3F', PHP:'\u20B1', SAR:'\u0631.\u0633', AED:'\u062F.\u0625', HKD:'HK$', INR:'\u20B9', BND:'B$', VND:'\u20AB', TWD:'NT$', CHF:'Fr', NZD:'NZ$', CAD:'C$' };
+    // Fallback rates (mid-market, approximate - only used if API fails completely)
+    const FALLBACK_RATES = { USD:1, IDR:16250, SGD:1.35, MYR:4.68, EUR:0.92, JPY:149.5, GBP:0.79, AUD:1.55, CNY:7.24, KRW:1320, THB:35.5, PHP:56.2, SAR:3.75, AED:3.67, HKD:7.82, INR:83.5, BND:1.35, VND:25450, TWD:32.3, CHF:0.88, NZD:1.67, CAD:1.37 };
+
+    let rates = null;         // { USD: 1, IDR: 16250, ... } (all relative to USD)
+    let baseCurrency = 'USD';
+    let isLoading = true;
+    let lastFetchSuccess = false;
+
+    // ============================================================
+    //  API
+    // ============================================================
+    async function fetchRates() {
+      setStatus('memuat', true);
+      showError(false);
+      try {
+        const resp = await fetch('https://open.er-api.com/v6/latest/USD', { signal: AbortSignal.timeout(10000) });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        if (data.result !== 'success') throw new Error('API returned non-success');
+        const filtered = {};
+        for (const c of CURRENCIES) {
+          if (data.rates[c] !== undefined) filtered[c] = data.rates[c];
+        }
+        rates = filtered;
+        baseCurrency = 'USD';
+        lastFetchSuccess = true;
+        localStorage.setItem('pc_rates', JSON.stringify({ rates: filtered, timestamp: Date.now() }));
+        setStatus('hidup', false);
+        return true;
+      } catch (e) {
+        console.warn('Primary API failed:', e);
+        // Try fallback API
+        try {
+          const resp2 = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json', { signal: AbortSignal.timeout(8000) });
+          if (!resp2.ok) throw new Error('HTTP ' + resp2.status);
+          const data2 = await resp2.json();
+          const filtered2 = {};
+          for (const c of CURRENCIES) {
+            const lower = c.toLowerCase();
+            if (data2.usd && data2.usd[lower] !== undefined) filtered2[c] = data2.usd[lower];
+          }
+          if (Object.keys(filtered2).length > 5) {
+            rates = filtered2;
+            baseCurrency = 'USD';
+            lastFetchSuccess = true;
+            localStorage.setItem('pc_rates', JSON.stringify({ rates: filtered2, timestamp: Date.now() }));
+            setStatus('hidup', false);
+            return true;
+          }
+          throw new Error('Not enough currencies from fallback');
+        } catch (e2) {
+          console.warn('Fallback API also failed:', e2);
+          // Try localStorage cached rates
+          const cached = localStorage.getItem('pc_rates');
+          if (cached) {
+            try {
+              const parsed = JSON.parse(cached);
+              if (parsed.rates && parsed.timestamp) {
+                rates = parsed.rates;
+                baseCurrency = 'USD';
+                lastFetchSuccess = false;
+                const age = Math.floor((Date.now() - parsed.timestamp) / 60000);
+                setStatus('cached', age);
+                showError(true, 'Gagal memuat kurs terbaru. Menggunakan kurs dari ' + age + ' menit lalu.');
+                return true;
+              }
+            } catch (_) {}
+          }
+          // Ultimate fallback: hardcoded rates
+          rates = { ...FALLBACK_RATES };
+          baseCurrency = 'USD';
+          lastFetchSuccess = false;
+          setStatus('estimasi', false);
+          showError(true, 'Tidak bisa terhubung ke server. Menggunakan kurs estimasi. Hasil mungkin tidak akurat.');
+          return true;
+        }
+      }
+    }
+
+    // ============================================================
+    //  UI STATUS
+    // ============================================================
+    function setStatus(mode, extra) {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      dot.className = 'glow-dot';
+      switch (mode) {
+        case 'memuat':
+          dot.classList.add('live');
+          text.textContent = 'Memuat kurs terkini...';
+          isLoading = true;
+          break;
+        case 'hidup':
+          dot.classList.add('live');
+          text.textContent = 'Kurs live - ' + new Date().toLocaleTimeString('id-ID');
+          isLoading = false;
+          break;
+        case 'cached':
+          dot.style.background = '#f59e0b';
+          dot.style.boxShadow = '0 0 8px rgba(245,158,11,0.5)';
+          text.textContent = 'Kurs tersimpan (' + extra + ' menit lalu) - ' + new Date().toLocaleTimeString('id-ID');
+          isLoading = false;
+          break;
+        case 'estimasi':
+          dot.style.background = '#ef4444';
+          dot.style.boxShadow = '0 0 8px rgba(239,68,68,0.5)';
+          text.textContent = 'Kurs estimasi - koneksi terputus';
+          isLoading = false;
+          break;
+      }
+    }
+
+    function showError(show, msg) {
+      const banner = document.getElementById('errorBanner');
+      const errText = document.getElementById('errorText');
+      if (show) {
+        banner.classList.remove('hidden');
+        errText.textContent = msg || 'Terjadi kesalahan.';
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    // ============================================================
+    //  CONVERSION ENGINE
+    // ============================================================
+    function convert() {
+      if (!rates) return;
+      const from = document.getElementById('fromCurrency').value;
+      const to = document.getElementById('toCurrency').value;
+      const amount = parseFloat(document.getElementById('amount').value) || 0;
+      updateBadge('fromBadge', from);
+      updateBadge('toBadge', to);
+
+      if (amount <= 0) {
+        document.getElementById('resultAmount').textContent = '0,00';
+        document.getElementById('resultCode').textContent = to;
+        document.getElementById('rateDisplay').textContent = 'Masukkan jumlah';
+        return;
+      }
+
+      // Convert: rates are USD-based (rates[X] = jumlah X per 1 USD)
+      let rate;
+      if (from === 'USD') {
+        rate = rates[to];
+      } else if (to === 'USD') {
+        rate = 1 / rates[from];
+      } else {
+        rate = rates[to] / rates[from];
+      }
+
+      const result = amount * rate;
+      const formattedResult = result.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const formattedAmount = amount.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      document.getElementById('resultAmount').textContent = formattedResult;
+      document.getElementById('resultCode').textContent = to;
+      document.getElementById('rateDisplay').textContent = '1 ' + from + ' = ' + rate.toLocaleString('id-ID', { minimumFractionDigits: 6, maximumFractionDigits: 6 }) + ' ' + to;
+    }
+
+    function updateBadge(id, code) {
+      const badge = document.getElementById(id);
+      const colors = ['#059669','#0369a1','#d97706','#dc2626','#7c3aed','#0891b2','#be185d','#65a30d','#0d9488','#9333ea','#ea580c','#2563eb','#ca8a04'];
+      const colorIdx = CURRENCIES.indexOf(code);
+      badge.style.background = colors[colorIdx % colors.length];
+      badge.textContent = code;
+    }
+
+    function swapCurrencies() {
+      const from = document.getElementById('fromCurrency');
+      const to = document.getElementById('toCurrency');
+      const tmp = from.value;
+      from.value = to.value;
+      to.value = tmp;
+      convert();
+    }
+
+    function setPair(from, to) {
+      document.getElementById('fromCurrency').value = from;
+      document.getElementById('toCurrency').value = to;
+      convert();
+    }
+
+    function setAmount(val) {
+      document.getElementById('amount').value = val;
+      convert();
+    }
+
+    async function refreshRates() {
+      document.getElementById('refreshBtn').innerHTML = '<span class="loader" style="width:16px;height:16px;border-width:2px;"></span>';
+      await fetchRates();
+      convert();
+      document.getElementById('refreshBtn').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>';
+    }
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    async function init() {
+      // Set default: IDR → USD
+      document.getElementById('fromCurrency').value = 'IDR';
+      document.getElementById('toCurrency').value = 'USD';
+      updateBadge('fromBadge', 'IDR');
+      updateBadge('toBadge', 'USD');
+      await fetchRates();
+      convert();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

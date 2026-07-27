@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kata Kilat - Tebak Kata Bahasa Indonesia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a25;
+    --border: rgba(99,102,241,0.2);
+    --border2: rgba(99,102,241,0.08);
+    --indigo: #6366f1;
+    --violet: #8b5cf6;
+    --indigo-dim: rgba(99,102,241,0.15);
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --text3: #475569;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Dot grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(99,102,241,0.12) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Ambient glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -40%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80vw;
+    height: 60vh;
+    background: radial-gradient(ellipse, rgba(99,102,241,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+    animation: fadeIn 0.3s ease;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- START SCREEN ---- */
+  .start-logo {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--indigo-dim);
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #a5b4fc;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .start-title {
+    font-size: clamp(42px, 10vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #e0e7ff 30%, #a5b4fc 70%, #c4b5fd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .start-sub {
+    font-size: 16px;
+    color: var(--text2);
+    line-height: 1.6;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .rule-item {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .rule-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--indigo-dim);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a5b4fc;
+  }
+  .rule-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .rule-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.4;
+  }
+
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 16px 28px;
+    background: var(--indigo);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary:hover {
+    background: #818cf8;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+  }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 24px;
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .btn-secondary:hover { background: var(--indigo-dim); color: var(--text); border-color: var(--indigo); }
+
+  /* High Scores */
+  .scores-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .score-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border2);
+  }
+  .score-row:last-child { border-bottom: none; }
+  .score-rank {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text3);
+    width: 24px;
+  }
+  .score-rank.gold { color: #fbbf24; }
+  .score-rank.silver { color: #94a3b8; }
+  .score-rank.bronze { color: #92400e; }
+  .score-name { flex: 1; font-size: 14px; color: var(--text2); padding: 0 12px; }
+  .score-val { font-size: 14px; font-weight: 700; color: #a5b4fc; }
+  .no-scores { text-align: center; color: var(--text3); font-size: 14px; padding: 16px 0; }
+
+  /* ---- GAME SCREEN ---- */
+  .game-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .progress-info {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text2);
+  }
+  .progress-info span { color: var(--text); }
+
+  .score-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .score-num {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--indigo);
+    font-variant-numeric: tabular-nums;
+  }
+  .streak-badge {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    background: rgba(251,191,36,0.15);
+    border: 1px solid rgba(251,191,36,0.3);
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fbbf24;
+  }
+  .streak-badge.visible { display: flex; }
+
+  /* Progress bar */
+  .progress-track {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 999px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--indigo), var(--violet));
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+
+  /* Timer */
+  .timer-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .timer-svg { transform: rotate(-90deg); }
+  .timer-track { fill: none; stroke: var(--surface2); stroke-width: 5; }
+  .timer-arc {
+    fill: none;
+    stroke: var(--indigo);
+    stroke-width: 5;
+    stroke-linecap: round;
+    transition: stroke 0.5s ease;
+  }
+  .timer-text {
+    font-size: 22px;
+    font-weight: 800;
+    fill: var(--text);
+    text-anchor: middle;
+    dominant-baseline: central;
+    transform: rotate(90deg);
+    transform-origin: center;
+    transform-box: fill-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .timer-label {
+    font-size: 9px;
+    fill: var(--text3);
+    text-anchor: middle;
+    dominant-baseline: central;
+    transform: rotate(90deg) translateY(16px);
+    transform-origin: center;
+    transform-box: fill-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Question card */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    margin-bottom: 20px;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .question-cat {
+    font-size: 11px;
+    font-weight: 700;
+    color: #a5b4fc;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+  .question-text {
+    font-size: clamp(17px, 4vw, 22px);
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .hint-text {
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #a5b4fc;
+    background: var(--indigo-dim);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    display: none;
+  }
+  .hint-text.visible { display: block; }
+
+  /* Answer input */
+  .input-wrap {
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .answer-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    letter-spacing: 0.02em;
+  }
+  .answer-input:focus {
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+  }
+  .answer-input::placeholder { color: var(--text3); font-weight: 500; }
+  .answer-input:disabled { opacity: 0.6; }
+
+  .game-actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+  }
+
+  .btn-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 14px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .btn-hint:hover { background: var(--indigo-dim); border-color: var(--indigo); color: var(--text); }
+  .btn-hint:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Feedback overlay */
+  .feedback-layer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .feedback-layer.visible { display: flex; }
+  .feedback-bubble {
+    padding: 18px 36px;
+    border-radius: var(--radius);
+    font-size: 20px;
+    font-weight: 800;
+    animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+  }
+  .feedback-bubble.correct {
+    background: rgba(16,185,129,0.2);
+    border: 2px solid var(--green);
+    color: #34d399;
+  }
+  .feedback-bubble.wrong {
+    background: rgba(239,68,68,0.2);
+    border: 2px solid var(--red);
+    color: #f87171;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* Answer reveal */
+  .answer-reveal {
+    display: none;
+    margin-bottom: 12px;
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #fca5a5;
+  }
+  .answer-reveal.visible { display: block; }
+  .answer-reveal strong { color: #f87171; }
+
+  /* Shake animation for wrong */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  /* ---- RESULT SCREEN ---- */
+  .result-hero {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .result-score-circle {
+    width: 140px;
+    height: 140px;
+    background: var(--indigo-dim);
+    border: 3px solid var(--indigo);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 40px rgba(99,102,241,0.2);
+  }
+  .result-score-num {
+    font-size: 38px;
+    font-weight: 800;
+    color: #a5b4fc;
+    line-height: 1;
+  }
+  .result-score-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .result-title {
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .result-sub {
+    font-size: 15px;
+    color: var(--text2);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-box {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .stat-num { font-size: 24px; font-weight: 800; color: var(--text); }
+  .stat-num.green { color: #34d399; }
+  .stat-num.red { color: #f87171; }
+  .stat-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+
+  /* Review list */
+  .review-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .review-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border2);
+    font-size: 13px;
+  }
+  .review-item:last-child { border-bottom: none; }
+  .review-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .review-dot.ok { background: var(--green); }
+  .review-dot.fail { background: var(--red); }
+  .review-word { font-weight: 700; color: var(--text); min-width: 100px; }
+  .review-def { color: var(--text2); line-height: 1.4; flex: 1; }
+
+  .result-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+
+  /* Name input for score */
+  .name-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .name-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+  }
+  .name-input:focus { border-color: var(--indigo); }
+  .name-input::placeholder { color: var(--text3); }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .rules-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .game-actions { grid-template-columns: 1fr; }
+    .btn-hint { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="screen-start" class="screen active">
+    <div class="start-logo">
+      <div class="logo-badge">
+        <i data-lucide="zap" style="width:13px;height:13px"></i>
+        Game Kata
+      </div>
+      <h1 class="start-title">Kata Kilat</h1>
+      <p class="start-sub">Tebak kata Bahasa Indonesia dari definisinya secepat mungkin. Makin cepat jawab, makin banyak poin!</p>
+    </div>
+
+    <div class="card">
+      <div class="rules-grid">
+        <div class="rule-item">
+          <div class="rule-icon"><i data-lucide="clock" style="width:16px;height:16px"></i></div>
+          <div class="rule-label">30 Detik</div>
+          <div class="rule-desc">Waktu per soal. Jawab cepat dapat lebih banyak poin.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon"><i data-lucide="target" style="width:16px;height:16px"></i></div>
+          <div class="rule-label">10 Soal</div>
+          <div class="rule-desc">Setiap sesi ada 10 soal acak dari berbagai kategori.</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon"><i data-lucide="trending-up" style="width:16px;height:16px"></i></div>
+          <div class="rule-label">Streak Bonus</div>
+          <div class="rule-desc">3 jawaban benar berturut-turut = bonus 30 poin ekstra!</div>
+        </div>
+        <div class="rule-item">
+          <div class="rule-icon"><i data-lucide="lightbulb" style="width:16px;height:16px"></i></div>
+          <div class="rule-label">Ada Petunjuk</div>
+          <div class="rule-desc">Tampilkan huruf pertama kata. Tapi nilai berkurang 20.</div>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="startGame()">
+        <i data-lucide="play" style="width:18px;height:18px"></i>
+        Mulai Bermain
+      </button>
+    </div>
+
+    <div class="card" id="highscores-card">
+      <div class="scores-title">Skor Tertinggi</div>
+      <div id="scores-list"></div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="screen-game" class="screen">
+    <div class="game-header">
+      <div class="progress-info">Soal <span id="q-num">1</span> dari <span>10</span></div>
+      <div class="score-display">
+        <div id="streak-badge" class="streak-badge">
+          <i data-lucide="flame" style="width:12px;height:12px"></i>
+          <span id="streak-num">0</span> streak
+        </div>
+        <div class="score-num" id="current-score">0</div>
+      </div>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="q-progress" style="width:0%"></div>
+    </div>
+
+    <div class="timer-wrap">
+      <svg class="timer-svg" width="100" height="100" viewBox="0 0 100 100">
+        <circle class="timer-track" cx="50" cy="50" r="42"/>
+        <circle class="timer-arc" id="timer-arc" cx="50" cy="50" r="42"
+          stroke-dasharray="263.9"
+          stroke-dashoffset="0"/>
+        <text class="timer-text" id="timer-text" x="50" y="50">30</text>
+        <text class="timer-label" x="50" y="66">detik</text>
+      </svg>
+    </div>
+
+    <div class="question-card" id="q-card">
+      <div class="question-cat" id="q-cat">Alam</div>
+      <div class="question-text" id="q-text">Memuat soal...</div>
+      <div class="hint-text" id="hint-display"></div>
+    </div>
+
+    <div class="answer-reveal" id="answer-reveal">
+      Jawaban yang benar: <strong id="correct-word"></strong>
+    </div>
+
+    <div class="input-wrap">
+      <input
+        type="text"
+        class="answer-input"
+        id="answer-input"
+        placeholder="Ketik jawabanmu di sini..."
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        autofocus
+      />
+    </div>
+
+    <div class="game-actions">
+      <button class="btn-primary" id="submit-btn" onclick="submitAnswer()">
+        <i data-lucide="send" style="width:16px;height:16px"></i>
+        Jawab
+      </button>
+      <button class="btn-hint" id="hint-btn" onclick="showHint()">
+        <i data-lucide="lightbulb" style="width:15px;height:15px"></i>
+        Petunjuk (-20)
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="screen-result" class="screen">
+    <div class="result-hero">
+      <div class="result-score-circle">
+        <div class="result-score-num" id="final-score">0</div>
+        <div class="result-score-label">poin</div>
+      </div>
+      <div class="result-title" id="result-title">Hasil Permainan</div>
+      <div class="result-sub" id="result-sub">Lihat hasilmu di bawah ini</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-num green" id="stat-correct">0</div>
+        <div class="stat-label">Benar</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num red" id="stat-wrong">0</div>
+        <div class="stat-label">Salah</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-acc">0%</div>
+        <div class="stat-label">Akurasi</div>
+      </div>
+    </div>
+
+    <div class="card" id="review-card">
+      <div class="review-header">Review Soal</div>
+      <div id="review-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="scores-title">Simpan Skormu</div>
+      <div class="name-row">
+        <input type="text" class="name-input" id="player-name" placeholder="Nama kamu..." maxlength="20" />
+        <button class="btn-secondary" onclick="saveScore()" style="width:auto;white-space:nowrap;padding:12px 20px">
+          <i data-lucide="save" style="width:15px;height:15px"></i>
+          Simpan
+        </button>
+      </div>
+      <div class="result-actions">
+        <button class="btn-primary" onclick="startGame()">
+          <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>
+          Main Lagi
+        </button>
+        <button class="btn-secondary" onclick="showStart()">
+          <i data-lucide="home" style="width:15px;height:15px"></i>
+          Ke Menu Utama
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Feedback overlay -->
+<div class="feedback-layer" id="feedback-layer">
+  <div class="feedback-bubble" id="feedback-bubble"></div>
+</div>
+
+<script>
+// ============================================================
+// BANK SOAL — 60 kata Bahasa Indonesia
+// ============================================================
+const BANK = [
+  // ALAM (12)
+  { kata: "rimba",      def: "Hutan lebat yang sangat luas, penuh pepohonan tinggi dan belukar rapat, jarang dijamah manusia.", kat: "Alam" },
+  { kata: "badai",      def: "Cuaca ekstrem dengan angin kencang dan hujan lebat yang berbahaya.", kat: "Alam" },
+  { kata: "kawah",      def: "Lubang besar di puncak gunung berapi yang mengeluarkan gas panas dan lava.", kat: "Alam" },
+  { kata: "telaga",     def: "Danau kecil yang airnya tenang, biasanya berada di pegunungan atau hutan.", kat: "Alam" },
+  { kata: "muara",      def: "Tempat bertemunya aliran sungai dengan laut atau danau.", kat: "Alam" },
+  { kata: "delta",      def: "Daratan berbentuk segitiga yang terbentuk dari endapan lumpur di ujung sungai besar.", kat: "Alam" },
+  { kata: "lereng",     def: "Bagian dari bukit atau gunung yang miring, antara puncak dan kaki.", kat: "Alam" },
+  { kata: "jurang",     def: "Celah atau lembah dalam dan curam di antara tebing-tebing tinggi.", kat: "Alam" },
+  { kata: "lembah",     def: "Dataran rendah panjang yang diapit oleh pegunungan atau bukit di kedua sisinya.", kat: "Alam" },
+  { kata: "laguna",     def: "Perairan dangkal yang dipisahkan dari laut oleh daratan pasir atau terumbu karang.", kat: "Alam" },
+  { kata: "monsun",     def: "Angin musiman yang membawa hujan lebat di Asia Tenggara, datang setiap setengah tahun.", kat: "Alam" },
+  { kata: "gletser",    def: "Massa es yang sangat besar dan bergerak perlahan menuruni lereng gunung.", kat: "Alam" },
+
+  // HEWAN (12)
+  { kata: "kancil",     def: "Hewan mungil berkaki kecil seperti rusa namun sangat kecil, terkenal dalam dongeng Melayu karena kecerdikannya.", kat: "Hewan" },
+  { kata: "tapir",      def: "Hewan mamalia besar berkaki empat dengan hidung memanjang seperti belalai pendek, hidup di hutan Sumatra.", kat: "Hewan" },
+  { kata: "bekantan",   def: "Monyet endemik Kalimantan yang khas karena hidungnya besar dan panjang berwarna merah, jantan punya hidung mencolok.", kat: "Hewan" },
+  { kata: "elang",      def: "Burung pemangsa besar berparuh kuat dan tajam, terbang tinggi mengincar mangsa dari udara.", kat: "Hewan" },
+  { kata: "kumbang",    def: "Serangga keras bersayap dua lapis, jenis terbanyak di bumi, sering ditemukan di bunga dan kayu.", kat: "Hewan" },
+  { kata: "kepiting",   def: "Hewan laut berkaki sepuluh dengan capit kuat, tubuh berbalut cangkang keras, berjalan menyamping.", kat: "Hewan" },
+  { kata: "kelelawar",  def: "Mamalia yang bisa terbang menggunakan ekolokasi, aktif di malam hari dan tidur bergantungan.", kat: "Hewan" },
+  { kata: "kadal",      def: "Reptil bertubuh pipih berkaki empat dan ekor panjang, sering berjemur di batu atau batang pohon.", kat: "Hewan" },
+  { kata: "tokek",      def: "Reptil nocturnal yang bisa menempel di dinding, berbunyi keras mengucapkan namanya sendiri.", kat: "Hewan" },
+  { kata: "dugong",     def: "Mamalia laut herbivora yang hidup di perairan dangkal tropis, sering disebut sapi laut atau putri duyung.", kat: "Hewan" },
+  { kata: "orangutan",  def: "Kera besar berbulu merah kecoklatan, hidup di pohon hutan Kalimantan dan Sumatra, satu-satunya kera besar Asia.", kat: "Hewan" },
+  { kata: "komodo",     def: "Kadal terbesar di dunia yang hidup di pulau-pulau Nusa Tenggara, pemangsa berbisa yang ganas.", kat: "Hewan" },
+
+  // MAKANAN (12)
+  { kata: "rendang",    def: "Masakan daging yang dimasak lama dengan santan dan rempah khas Minangkabau hingga kering dan berwarna gelap.", kat: "Makanan" },
+  { kata: "tempe",      def: "Makanan fermentasi kedelai yang diikat jamur menjadi padatan padat, khas Indonesia dan bergizi tinggi.", kat: "Makanan" },
+  { kata: "klepon",     def: "Kue tradisional berbentuk bola hijau dari tepung ketan berisi gula merah, dilapisi kelapa parut.", kat: "Makanan" },
+  { kata: "dawet",      def: "Minuman manis berisi mi hijau kenyal dari tepung beras, disiram santan dan gula merah cair.", kat: "Makanan" },
+  { kata: "lemper",     def: "Camilan dari beras ketan berisi daging atau abon yang dibungkus daun pisang lalu dikukus.", kat: "Makanan" },
+  { kata: "nagasari",   def: "Kue kukus dibungkus daun pisang berisi pisang, terbuat dari campuran tepung beras dan santan.", kat: "Makanan" },
+  { kata: "gudeg",      def: "Masakan khas Yogyakarta dari nangka muda yang dimasak berjam-jam dengan santan dan bumbu hingga berwarna coklat manis.", kat: "Makanan" },
+  { kata: "pempek",     def: "Makanan khas Palembang dari ikan dan tepung sagu, disajikan dengan kuah cuka asam pedas.", kat: "Makanan" },
+  { kata: "rujak",      def: "Campuran buah-buahan segar yang disiram atau dicampur bumbu pedas manis dari cabai dan gula merah.", kat: "Makanan" },
+  { kata: "asinan",     def: "Hidangan sayuran atau buah yang diawetkan dengan cuka atau garam, rasanya asam segar dan sedikit asin.", kat: "Makanan" },
+  { kata: "dodol",      def: "Makanan manis kenyal berwarna gelap terbuat dari tepung ketan, santan, dan gula merah yang dimasak lama.", kat: "Makanan" },
+  { kata: "lontong",    def: "Nasi yang dimasak dalam bungkusan daun pisang hingga padat, biasa dimakan dengan sayur atau sate.", kat: "Makanan" },
+
+  // BENDA (12)
+  { kata: "gayung",     def: "Alat penyiduk air berbentuk mangkuk dengan gagang panjang, dipakai untuk mengambil air dari bak mandi.", kat: "Benda" },
+  { kata: "cobek",      def: "Alat masak berbentuk mangkuk datar dari batu atau tanah liat untuk menghaluskan bumbu.", kat: "Benda" },
+  { kata: "gerobak",    def: "Kendaraan roda dua tanpa mesin yang ditarik atau didorong manusia untuk mengangkut barang atau dagangan.", kat: "Benda" },
+  { kata: "anyaman",    def: "Karya dari bahan serat seperti bambu, rotan, atau daun yang dijalin silang membentuk pola tertentu.", kat: "Benda" },
+  { kata: "kendi",      def: "Wadah air tradisional terbuat dari tanah liat berwarna coklat dengan leher kecil, air di dalamnya terasa segar alami.", kat: "Benda" },
+  { kata: "ranjang",    def: "Tempat tidur yang memiliki rangka dari kayu atau logam dengan kaki yang mengangkatnya dari lantai.", kat: "Benda" },
+  { kata: "kompas",     def: "Alat penunjuk arah yang menggunakan magnet untuk selalu mengarah ke utara, dipakai pelaut dan pendaki.", kat: "Benda" },
+  { kata: "mercusuar",  def: "Menara tinggi di tepi pantai atau pulau dengan lampu berputar untuk memandu kapal di malam hari.", kat: "Benda" },
+  { kata: "tambang",    def: "Tali tebal yang kuat terbuat dari serat alam atau sintetis, digunakan untuk mengikat atau menarik benda berat.", kat: "Benda" },
+  { kata: "gelang",     def: "Perhiasan berbentuk lingkaran yang dikenakan di pergelangan tangan, terbuat dari emas, perak, atau karet.", kat: "Benda" },
+  { kata: "dayung",     def: "Alat berbentuk panjang dengan bilah pipih di ujungnya untuk menggerakkan perahu dengan cara dikayuh.", kat: "Benda" },
+  { kata: "perkamen",   def: "Bahan tulisan kuno yang dibuat dari kulit hewan yang dikeringkan dan dihaluskan sebelum ada kertas.", kat: "Benda" },
+
+  // SIFAT (6)
+  { kata: "kikir",      def: "Sifat seseorang yang sangat enggan memberikan hartanya kepada orang lain meski memiliki banyak.", kat: "Sifat" },
+  { kata: "dermawan",   def: "Sifat suka memberi dan murah hati kepada orang lain yang membutuhkan.", kat: "Sifat" },
+  { kata: "bijaksana",  def: "Sifat pandai dan cermat dalam mempertimbangkan suatu keputusan berdasarkan pengalaman dan kearifan.", kat: "Sifat" },
+  { kata: "pemberani",  def: "Sifat tidak merasa takut menghadapi bahaya atau hal yang menakutkan.", kat: "Sifat" },
+  { kata: "cermat",     def: "Sifat teliti dan hati-hati dalam melakukan sesuatu sehingga tidak mudah membuat kesalahan.", kat: "Sifat" },
+  { kata: "serakah",    def: "Sifat tidak pernah puas dan selalu ingin memiliki lebih dari yang dimiliki, tanpa mempedulikan orang lain.", kat: "Sifat" },
+
+  // PROFESI (6)
+  { kata: "nelayan",    def: "Orang yang mata pencahariannya menangkap ikan di laut atau sungai menggunakan jaring atau pancing.", kat: "Profesi" },
+  { kata: "pengrajin",  def: "Orang yang membuat barang-barang kerajinan tangan dengan keahlian khusus seperti ukiran kayu atau anyaman.", kat: "Profesi" },
+  { kata: "arsitek",    def: "Ahli yang merancang dan merencanakan bangunan serta ruang, memastikan fungsi dan estetika yang baik.", kat: "Profesi" },
+  { kata: "pelukis",    def: "Seniman yang membuat karya seni visual menggunakan cat di atas kanvas atau permukaan lainnya.", kat: "Profesi" },
+  { kata: "penjahit",   def: "Orang yang pekerjaannya menjahit kain menjadi pakaian atau barang lain menggunakan mesin atau tangan.", kat: "Profesi" },
+  { kata: "pandai besi",def: "Pengrajin yang membuat atau memperbaiki peralatan dari besi dan baja menggunakan panas dan palu.", kat: "Profesi" },
+];
+
+// ============================================================
+// GAME STATE
+// ============================================================
+const QUESTIONS_PER_GAME = 10;
+const TIME_PER_QUESTION = 30;
+const CIRCUMFERENCE = 2 * Math.PI * 42; // ≈ 263.9
+
+let state = {
+  phase: 'start',    // start | playing | feedback | result
+  questions: [],     // shuffled subset
+  qIndex: 0,
+  score: 0,
+  streak: 0,
+  hintUsed: false,
+  timeLeft: TIME_PER_QUESTION,
+  timerRAF: null,
+  timerStart: null,
+  answers: [],       // {kata, def, kat, correct, playerAnswer}
+};
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function normalize(str) {
+  return str.trim().toLowerCase()
+    .replace(/[àáâãäå]/g, 'a').replace(/[èéêë]/g, 'e')
+    .replace(/[ìíîï]/g, 'i').replace(/[òóôõö]/g, 'o')
+    .replace(/[ùúûü]/g, 'u').replace(/[ñ]/g, 'n');
+}
+
+function getHighScores() {
+  try { return JSON.parse(localStorage.getItem('katakilat_scores') || '[]'); }
+  catch { return []; }
+}
+
+function saveHighScore(name, score) {
+  try {
+    let scores = getHighScores();
+    scores.push({ name: name || 'Anonim', score, date: new Date().toLocaleDateString('id-ID') });
+    scores.sort((a, b) => b.score - a.score);
+    scores = scores.slice(0, 5);
+    localStorage.setItem('katakilat_scores', JSON.stringify(scores));
+  } catch {}
+}
+
+// ============================================================
+// SCREENS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showStart() {
+  stopTimer();
+  renderHighScores();
+  showScreen('screen-start');
+}
+
+function renderHighScores() {
+  const scores = getHighScores();
+  const list = document.getElementById('scores-list');
+  const rankClasses = ['gold', 'silver', 'bronze', '', ''];
+  if (scores.length === 0) {
+    list.innerHTML = '<div class="no-scores">Belum ada skor tersimpan. Mainkan dulu!</div>';
+    return;
+  }
+  list.innerHTML = scores.map((s, i) => `
+    <div class="score-row">
+      <div class="score-rank ${rankClasses[i]}">#${i+1}</div>
+      <div class="score-name">${escHtml(s.name)}</div>
+      <div class="score-val">${s.score} poin</div>
+    </div>
+  `).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// GAME START
+// ============================================================
+function startGame() {
+  state = {
+    phase: 'playing',
+    questions: shuffle(BANK).slice(0, QUESTIONS_PER_GAME),
+    qIndex: 0,
+    score: 0,
+    streak: 0,
+    hintUsed: false,
+    timeLeft: TIME_PER_QUESTION,
+    timerRAF: null,
+    timerStart: null,
+    answers: [],
+  };
+  showScreen('screen-game');
+  renderQuestion();
+}
+
+// ============================================================
+// QUESTION RENDERING
+// ============================================================
+function renderQuestion() {
+  const q = state.questions[state.qIndex];
+  state.hintUsed = false;
+  state.timeLeft = TIME_PER_QUESTION;
+
+  // Progress
+  document.getElementById('q-num').textContent = state.qIndex + 1;
+  const pct = (state.qIndex / QUESTIONS_PER_GAME) * 100;
+  document.getElementById('q-progress').style.width = pct + '%';
+
+  // Score + streak
+  document.getElementById('current-score').textContent = state.score;
+  const sb = document.getElementById('streak-badge');
+  if (state.streak >= 3) {
+    sb.classList.add('visible');
+    document.getElementById('streak-num').textContent = state.streak;
+  } else {
+    sb.classList.remove('visible');
+  }
+
+  // Question
+  document.getElementById('q-cat').textContent = q.kat;
+  document.getElementById('q-text').textContent = q.def;
+  document.getElementById('hint-display').textContent = '';
+  document.getElementById('hint-display').classList.remove('visible');
+
+  // Input
+  const inp = document.getElementById('answer-input');
+  inp.value = '';
+  inp.disabled = false;
+  inp.focus();
+
+  // Reveal
+  document.getElementById('answer-reveal').classList.remove('visible');
+
+  // Buttons
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('hint-btn').disabled = false;
+
+  // Timer
+  startTimer();
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer() {
+  stopTimer();
+  state.timerStart = performance.now();
+  state.timeLeft = TIME_PER_QUESTION;
+  updateTimerUI(TIME_PER_QUESTION);
+  state.timerRAF = requestAnimationFrame(tickTimer);
+}
+
+function tickTimer(now) {
+  const elapsed = (now - state.timerStart) / 1000;
+  const remaining = Math.max(0, TIME_PER_QUESTION - elapsed);
+  state.timeLeft = remaining;
+  updateTimerUI(remaining);
+
+  if (remaining <= 0) {
+    timeUp();
+    return;
+  }
+  state.timerRAF = requestAnimationFrame(tickTimer);
+}
+
+function stopTimer() {
+  if (state.timerRAF) {
+    cancelAnimationFrame(state.timerRAF);
+    state.timerRAF = null;
+  }
+}
+
+function updateTimerUI(remaining) {
+  const secs = Math.ceil(remaining);
+  document.getElementById('timer-text').textContent = secs;
+
+  const ratio = remaining / TIME_PER_QUESTION;
+  const offset = CIRCUMFERENCE * (1 - ratio);
+  const arc = document.getElementById('timer-arc');
+  arc.style.strokeDashoffset = offset;
+
+  // Color: green → yellow → red
+  if (ratio > 0.5) {
+    arc.style.stroke = '#6366f1';
+  } else if (ratio > 0.25) {
+    arc.style.stroke = '#f59e0b';
+  } else {
+    arc.style.stroke = '#ef4444';
+  }
+}
+
+function timeUp() {
+  stopTimer();
+  if (state.phase !== 'playing') return;
+  const q = state.questions[state.qIndex];
+  state.streak = 0;
+  state.answers.push({ kata: q.kata, def: q.def, kat: q.kat, correct: false, playerAnswer: '' });
+  showWrong(q.kata);
+}
+
+// ============================================================
+// ANSWERING
+// ============================================================
+function submitAnswer() {
+  if (state.phase !== 'playing') return;
+  const inp = document.getElementById('answer-input');
+  const raw = inp.value.trim();
+  if (!raw) { inp.focus(); return; }
+  stopTimer();
+
+  const q = state.questions[state.qIndex];
+  const isCorrect = normalize(raw) === normalize(q.kata);
+
+  if (isCorrect) {
+    // Points: time-based max 100, streak bonus
+    const basePoints = Math.max(10, Math.round(10 + (state.timeLeft / TIME_PER_QUESTION) * 70));
+    const hintPenalty = state.hintUsed ? 20 : 0;
+    let pts = Math.max(5, basePoints - hintPenalty);
+    state.streak += 1;
+    if (state.streak > 0 && state.streak % 3 === 0) pts += 30;
+    state.score += pts;
+    state.answers.push({ kata: q.kata, def: q.def, kat: q.kat, correct: true, playerAnswer: raw });
+    showCorrect(pts);
+  } else {
+    state.streak = 0;
+    state.answers.push({ kata: q.kata, def: q.def, kat: q.kat, correct: false, playerAnswer: raw });
+    showWrong(q.kata);
+  }
+}
+
+function showHint() {
+  if (state.hintUsed) return;
+  state.hintUsed = true;
+  const q = state.questions[state.qIndex];
+  const hintEl = document.getElementById('hint-display');
+  // Show first letter + dashes for rest
+  const hint = q.kata.split('').map((c, i) =>
+    i === 0 ? c.toUpperCase() : (c === ' ' ? ' ' : '_')
+  ).join(' ');
+  hintEl.textContent = 'Petunjuk: ' + hint + '  (' + q.kata.length + ' huruf)';
+  hintEl.classList.add('visible');
+  document.getElementById('hint-btn').disabled = true;
+}
+
+// ============================================================
+// FEEDBACK
+// ============================================================
+function showCorrect(pts) {
+  state.phase = 'feedback';
+  const q = state.questions[state.qIndex];
+  document.getElementById('answer-input').disabled = true;
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('hint-btn').disabled = true;
+
+  // Update score display
+  document.getElementById('current-score').textContent = state.score;
+  const sb = document.getElementById('streak-badge');
+  if (state.streak >= 3) {
+    sb.classList.add('visible');
+    document.getElementById('streak-num').textContent = state.streak;
+  }
+
+  // Bubble
+  const msg = state.streak > 0 && state.streak % 3 === 0
+    ? `+${pts} poin! Streak ${state.streak}x!`
+    : `+${pts} poin!`;
+  showFeedbackBubble(msg, 'correct');
+
+  setTimeout(nextQuestion, 1600);
+}
+
+function showWrong(correctWord) {
+  state.phase = 'feedback';
+  document.getElementById('answer-input').disabled = true;
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('hint-btn').disabled = true;
+
+  // Shake card
+  const card = document.getElementById('q-card');
+  card.classList.add('shake');
+  setTimeout(() => card.classList.remove('shake'), 500);
+
+  // Show correct answer
+  document.getElementById('correct-word').textContent = correctWord;
+  document.getElementById('answer-reveal').classList.add('visible');
+
+  showFeedbackBubble('Salah!', 'wrong');
+
+  setTimeout(nextQuestion, 2200);
+}
+
+function showFeedbackBubble(msg, type) {
+  const layer = document.getElementById('feedback-layer');
+  const bubble = document.getElementById('feedback-bubble');
+  bubble.textContent = msg;
+  bubble.className = 'feedback-bubble ' + type;
+  layer.classList.add('visible');
+  setTimeout(() => layer.classList.remove('visible'), 1200);
+}
+
+// ============================================================
+// NEXT QUESTION / END
+// ============================================================
+function nextQuestion() {
+  state.phase = 'playing';
+  state.qIndex += 1;
+  if (state.qIndex >= QUESTIONS_PER_GAME) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ============================================================
+// RESULT
+// ============================================================
+function showResult() {
+  state.phase = 'result';
+  showScreen('screen-result');
+  const correct = state.answers.filter(a => a.correct).length;
+  const wrong = QUESTIONS_PER_GAME - correct;
+  const acc = Math.round((correct / QUESTIONS_PER_GAME) * 100);
+
+  document.getElementById('final-score').textContent = state.score;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-acc').textContent = acc + '%';
+
+  // Title based on score
+  let title, sub;
+  if (state.score >= 800) {
+    title = 'Luar Biasa!';
+    sub = 'Kamu adalah Maestro Kata sejati. Skor fantastis!';
+  } else if (state.score >= 600) {
+    title = 'Hebat!';
+    sub = 'Pengetahuan bahasamu sangat bagus. Terus asah!';
+  } else if (state.score >= 400) {
+    title = 'Bagus!';
+    sub = 'Hasil yang cukup baik. Coba lagi untuk lebih tinggi!';
+  } else if (state.score >= 200) {
+    title = 'Cukup Baik';
+    sub = 'Masih banyak kata yang bisa dipelajari. Ayo coba lagi!';
+  } else {
+    title = 'Terus Berlatih';
+    sub = 'Jangan menyerah, belajar kata itu seru. Main lagi!';
+  }
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-sub').textContent = sub;
+
+  // Review list
+  const rl = document.getElementById('review-list');
+  rl.innerHTML = state.answers.map(a => `
+    <div class="review-item">
+      <div class="review-dot ${a.correct ? 'ok' : 'fail'}"></div>
+      <div class="review-word">${escHtml(a.kata)}</div>
+      <div class="review-def">${escHtml(a.def)}</div>
+    </div>
+  `).join('');
+
+  // Clear name input
+  document.getElementById('player-name').value = '';
+}
+
+function saveScore() {
+  const name = document.getElementById('player-name').value.trim() || 'Anonim';
+  saveHighScore(name, state.score);
+  const btn = document.querySelector('[onclick="saveScore()"]');
+  btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px"></i> Tersimpan!';
+  btn.disabled = true;
+  lucide.createIcons();
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && state.phase === 'playing') {
+    e.preventDefault();
+    submitAnswer();
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  lucide.createIcons();
+  renderHighScores();
+}
+
+init();
+</script>
+</body>
+</html>

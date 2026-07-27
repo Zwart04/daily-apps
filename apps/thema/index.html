@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thema — Brand Theme Generator from Images</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23f59e0b'/><text x='16' y='22' text-anchor='middle' font-size='18' font-weight='bold' fill='white'>T</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/culori@4.0.2/bundled/culori.min.js"></script>
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #09090b; color: #f4f4f5; min-height: 100dvh;
+}
+::selection { background: #f59e0b33; color: #f4f4f5; }
+
+/* Nav */
+nav {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; padding: 0 20px; border-bottom: 1px solid #27272a;
+  background: #09090b; position: sticky; top: 0; z-index: 50;
+}
+nav .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; letter-spacing: -0.03em; }
+nav .logo svg { width: 28px; height: 28px; }
+nav .logo span { background: linear-gradient(135deg,#fbbf24,#f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+nav .logo .sub { font-weight: 400; font-size: 12px; color: #71717a; margin-left: -4px; letter-spacing: 0; }
+
+/* Layout */
+.container { max-width: 1400px; margin: 0 auto; padding: 32px 20px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.grid-full { grid-column: 1 / -1; }
+
+/* Upload Zone */
+.upload-zone {
+  border: 2px dashed #3f3f46; border-radius: 16px; padding: 60px 32px;
+  text-align: center; cursor: pointer; transition: all 0.2s;
+  background: #18181b; position: relative; overflow: hidden;
+}
+.upload-zone:hover, .upload-zone.dragover { border-color: #f59e0b; background: #1c1c21; }
+.upload-zone.has-image { padding: 0; border-style: solid; border-color: #27272a; background: transparent; }
+.upload-zone img { max-width: 100%; max-height: 300px; object-fit: contain; display: block; margin: 0 auto; border-radius: 8px; }
+.upload-zone .upload-icon { width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.3; color: #f59e0b; }
+.upload-zone h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #d4d4d8; }
+.upload-zone p { font-size: 13px; color: #71717a; max-width: 300px; margin: 0 auto; line-height: 1.5; }
+.upload-zone input[type=file] { display: none; }
+.upload-zone .remove-img {
+  position: absolute; top: 8px; right: 8px; z-index: 10;
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: #18181b; color: #a1a1aa; cursor: pointer;
+  display: none; align-items: center; justify-content: center;
+  font-size: 16px; transition: all 0.12s;
+}
+.upload-zone.has-image .remove-img { display: flex; }
+.upload-zone .remove-img:hover { background: #ef4444; color: white; }
+
+/* Swatches */
+.swatches { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.swatch {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  min-width: 80px;
+}
+.swatch .color-box {
+  width: 64px; height: 64px; border-radius: 12px; border: 2px solid #3f3f46;
+  position: relative; cursor: pointer; transition: transform 0.12s;
+}
+.swatch .color-box:hover { transform: scale(1.08); }
+.swatch .color-box .copy-badge {
+  position: absolute; bottom: -4px; right: -4px;
+  font-size: 8px; padding: 1px 5px; border-radius: 4px;
+  background: #18181b; border: 1px solid #3f3f46; color: #a1a1aa;
+  opacity: 0; transition: opacity 0.12s; white-space: nowrap;
+}
+.swatch .color-box:hover .copy-badge { opacity: 1; }
+.swatch .color-hex { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #a1a1aa; }
+.swatch .color-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #52525b; }
+
+/* Section Headers */
+.section-header { margin-bottom: 16px; }
+.section-header h2 { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+.section-header p { font-size: 13px; color: #71717a; margin-top: 2px; }
+
+/* Card */
+.card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-header h3 { font-size: 14px; font-weight: 600; }
+.card-header .copy-btn {
+  padding: 4px 12px; border: 1px solid #3f3f46; border-radius: 6px;
+  font-size: 11px; font-weight: 500; cursor: pointer; background: #27272a;
+  color: #a1a1aa; transition: all 0.12s; display: flex; align-items: center; gap: 4px;
+}
+.card-header .copy-btn:hover { background: #3f3f46; color: #f4f4f5; border-color: #52525b; }
+.card-header .copy-btn.copied { background: #16a34a; border-color: #16a34a; color: white; }
+
+/* Code blocks */
+.code-block {
+  background: #09090b; border: 1px solid #27272a; border-radius: 8px;
+  padding: 16px; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px; line-height: 1.7; overflow-x: auto; white-space: pre;
+  color: #d4d4d8; max-height: 400px; overflow-y: auto;
+  tab-size: 2; position: relative;
+}
+.code-block .comment { color: #6b7280; }
+.code-block .keyword { color: #818cf8; }
+.code-block .string { color: #34d399; }
+.code-block .number { color: #fbbf24; }
+.code-block .property { color: #60a5fa; }
+.code-block .punctuation { color: #a1a1aa; }
+
+/* Empty state */
+.empty-state {
+  text-align: center; padding: 40px 0; color: #52525b;
+}
+.empty-state svg { width: 40px; height: 40px; margin: 0 auto 12px; opacity: 0.2; }
+.empty-state h3 { font-size: 15px; font-weight: 500; color: #71717a; margin-bottom: 4px; }
+.empty-state p { font-size: 13px; max-width: 300px; margin: 0 auto; line-height: 1.5; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; background: #27272a; padding: 4px; border-radius: 8px; margin-bottom: 16px; }
+.tab-btn {
+  padding: 6px 16px; border: none; border-radius: 6px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  color: #a1a1aa; background: transparent; transition: all 0.12s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: #f4f4f5; }
+.tab-btn.active { background: #18181b; color: #f4f4f5; }
+
+/* Theme Preview */
+.theme-preview {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.theme-preview .preview-card {
+  background: var(--pv-surface); border: 1px solid var(--pv-border); border-radius: 12px; padding: 24px;
+  color: var(--pv-text);
+}
+.theme-preview .preview-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--pv-text); }
+.theme-preview .preview-card p { font-size: 13px; line-height: 1.6; color: var(--pv-muted); margin-bottom: 16px; }
+.preview-btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.preview-btn {
+  padding: 8px 20px; border: none; border-radius: 8px; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.12s;
+}
+.preview-btn.primary { background: var(--pv-primary); color: var(--pv-primary-fg); }
+.preview-btn.secondary { background: var(--pv-secondary); color: var(--pv-secondary-fg); }
+.preview-btn.outline { background: transparent; border: 1px solid var(--pv-border); color: var(--pv-text); }
+.preview-btn.ghost { background: transparent; color: var(--pv-text); }
+.preview-btn.ghost:hover { background: var(--pv-accent); }
+.preview-badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 500;
+  background: var(--pv-accent); color: var(--pv-accent-fg);
+}
+.preview-input {
+  width: 100%; padding: 8px 12px; border: 1px solid var(--pv-border);
+  border-radius: 8px; font-size: 13px; background: var(--pv-surface); color: var(--pv-text);
+  outline: none; margin-bottom: 12px;
+}
+.preview-input:focus { border-color: var(--pv-primary); }
+.preview-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.preview-stat {
+  background: var(--pv-accent); border-radius: 8px; padding: 12px; text-align: center;
+}
+.preview-stat .num { font-size: 20px; font-weight: 700; color: var(--pv-accent-fg); }
+.preview-stat .label { font-size: 11px; color: var(--pv-muted); margin-top: 2px; }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: #18181b; border: 1px solid #3f3f46; border-radius: 8px;
+  padding: 8px 20px; font-size: 13px; color: #d4d4d8;
+  opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 99999;
+}
+#toast.show { opacity: 1; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease-out; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+  .container { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="7" fill="#f59e0b"/><path d="M7 18l7-14 7 14M10 15l-3 0M14 11l-6 0M18 15l-3 0" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <div><span>Thema</span><span class="sub">v1</span></div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span style="font-size:12px;color:#71717a">Extract colors, generate themes</span>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- Upload -->
+  <div class="grid fade-in">
+    <div>
+      <div class="section-header">
+        <h2>Source Image</h2>
+        <p>Upload a logo, brand photo, or any image to extract its color story</p>
+      </div>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <h3>Drop image or click to upload</h3>
+        <p>JPG, PNG, WebP — any image with brand colors</p>
+        <button class="remove-img" id="removeImage" title="Remove image">&times;</button>
+        <img id="previewImage" style="display:none" alt="Uploaded image">
+      </div>
+    </div>
+
+    <!-- Extracted Colors -->
+    <div>
+      <div class="section-header">
+        <h2>Extracted Colors</h2>
+        <p>Dominant colors automatically detected from your image</p>
+      </div>
+      <div class="swatches" id="swatches">
+        <div class="empty-state" id="swatchEmpty" style="display:block">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          <h3>No image yet</h3>
+          <p>Upload an image to extract its dominant colors</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme Output -->
+  <div id="themeSection" style="display:none">
+    <div style="margin-top:40px;border-top:1px solid #27272a;padding-top:32px">
+      <div class="section-header">
+        <h2>Brand Theme</h2>
+        <p>Semantic theme system generated from your colors</p>
+      </div>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="tabs" id="modeTabs">
+      <button class="tab-btn active" data-mode="light" onclick="switchThemeMode('light')">Light Mode</button>
+      <button class="tab-btn" data-mode="dark" onclick="switchThemeMode('dark')">Dark Mode</button>
+    </div>
+
+    <!-- Live UI Preview -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-header">
+        <h3>Live Preview</h3>
+        <span style="font-size:11px;color:#71717a">Theme applied to sample UI</span>
+      </div>
+      <div id="livePreview" class="theme-preview"></div>
+    </div>
+
+    <!-- Export Tabs -->
+    <div class="tabs" id="exportTabs">
+      <button class="tab-btn active" data-tab="css" onclick="switchExportTab('css')">CSS Variables</button>
+      <button class="tab-btn" data-tab="tailwind" onclick="switchExportTab('tailwind')">Tailwind v4</button>
+      <button class="tab-btn" data-tab="shadcn" onclick="switchExportTab('shadcn')">shadcn/ui</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3 id="exportTitle">CSS Custom Properties</h3>
+        <button class="copy-btn" id="copyCodeBtn" onclick="copyExport()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="code-block" id="exportCode">/* Upload an image to generate your theme */</div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ========================
+// === STATE
+// ========================
+let extractedColors = [];
+let selectedThemeMode = 'light';
+let currentTheme = null;
+let currentExport = '';
+let colorRoleNames = ['Primary', 'Secondary', 'Accent', 'Surface', 'Text'];
+
+// ========================
+// === CULORI HELPERS (CDN)
+// ========================
+// culori is loaded as window.culori from CDN
+// Key functions: formatHex, converter('oklch'), converter('rgb'), wcagContrast, wcagLuminance
+
+// ========================
+// === IMAGE UPLOAD
+// ========================
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const previewImage = document.getElementById('previewImage');
+const removeBtn = document.getElementById('removeImage');
+
+uploadZone.addEventListener('click', (e) => {
+  if (e.target === removeBtn || removeBtn.contains(e.target)) return;
+  fileInput.click();
+});
+
+uploadZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadZone.classList.add('dragover');
+});
+
+uploadZone.addEventListener('dragleave', () => {
+  uploadZone.classList.remove('dragover');
+});
+
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) processImage(file);
+});
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files[0]) processImage(e.target.files[0]);
+});
+
+removeBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  resetUpload();
+});
+
+function resetUpload() {
+  uploadZone.classList.remove('has-image');
+  previewImage.style.display = 'none';
+  previewImage.src = '';
+  fileInput.value = '';
+  extractedColors = [];
+  currentTheme = null;
+  document.getElementById('swatchEmpty').style.display = 'block';
+  document.querySelectorAll('.swatch-item').forEach(el => el.remove());
+  document.getElementById('themeSection').style.display = 'none';
+}
+
+function processImage(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      previewImage.src = e.target.result;
+      previewImage.style.display = 'block';
+      uploadZone.classList.add('has-image');
+      document.getElementById('swatchEmpty').style.display = 'none';
+      extractColors(img);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ========================
+// === COLOR EXTRACTION (Median Cut quantization)
+// ========================
+function extractColors(img) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  // Sample at reasonable size
+  const maxDim = 200;
+  let w = img.naturalWidth, h = img.naturalHeight;
+  if (w > maxDim || h > maxDim) {
+    const ratio = Math.min(maxDim / w, maxDim / h);
+    w = Math.round(w * ratio);
+    h = Math.round(h * ratio);
+  }
+  canvas.width = w;
+  canvas.height = h;
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const imageData = ctx.getImageData(0, 0, w, h);
+  const pixels = imageData.data;
+
+  // Collect all pixels (skip transparent)
+  const colorMap = new Map();
+  for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+    const a = pixels[i + 3];
+    if (a < 128) continue;
+
+    // Quantize to reduce noise (down to 4-bit per channel)
+    const qr = Math.round(r / 16) * 16;
+    const qg = Math.round(g / 16) * 16;
+    const qb = Math.round(b / 16) * 16;
+    const key = `${qr},${qg},${qb}`;
+    colorMap.set(key, (colorMap.get(key) || 0) + 1);
+  }
+
+  // Sort by frequency, get top colors
+  const sorted = Array.from(colorMap.entries())
+    .sort((a, b) => b[1] - a[1]);
+
+  // Weighted color merging: merge similar colors within threshold
+  const merged = [];
+  const threshold = 48; // max Euclidean distance to merge
+
+  for (const [key, count] of sorted) {
+    const [r, g, b] = key.split(',').map(Number);
+    let matched = false;
+
+    for (let j = 0; j < merged.length; j++) {
+      const m = merged[j];
+      const dist = Math.sqrt(
+        (m.r - r) ** 2 + (m.g - g) ** 2 + (m.b - b) ** 2
+      );
+      if (dist < threshold) {
+        // Weighted merge
+        const totalWt = m.wt + count;
+        m.r = Math.round((m.r * m.wt + r * count) / totalWt / 16) * 16;
+        m.g = Math.round((m.g * m.wt + g * count) / totalWt / 16) * 16;
+        m.b = Math.round((m.b * m.wt + b * count) / totalWt / 16) * 16;
+        m.wt = totalWt;
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) {
+      merged.push({ r: Math.round(r / 16) * 16, g: Math.round(g / 16) * 16, b: Math.round(b / 16) * 16, wt: count });
+    }
+  }
+
+  // Sort by weight descending, take top 5
+  merged.sort((a, b) => b.wt - a.wt);
+  const topColors = merged.slice(0, 6);
+
+  // Refine: get the exact original pixel closest to each quantized centroid
+  const refined = topColors.map(c => {
+    const hex = rgbToHex(c.r, c.g, c.b);
+    return hex;
+  });
+
+  extractedColors = refined;
+  renderSwatches();
+  generateTheme();
+}
+
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(x =>
+    Math.max(0, Math.min(255, Math.round(x))).toString(16).padStart(2, '0')
+  ).join('');
+}
+
+// ========================
+// === SWATCHES RENDER
+// ========================
+function renderSwatches() {
+  const container = document.getElementById('swatches');
+  // Remove old items
+  document.querySelectorAll('.swatch-item').forEach(el => el.remove());
+
+  const names = ['Primary', 'Secondary', 'Accent', 'Base', 'Highlight', 'Extra'];
+
+  extractedColors.forEach((hex, i) => {
+    const swatch = document.createElement('div');
+    swatch.className = 'swatch swatch-item';
+    swatch.innerHTML = `
+      <div class="color-box" style="background:${hex}" onclick="copyToClipboard('${hex}')">
+        <span class="copy-badge">Copy</span>
+      </div>
+      <span class="color-hex">${hex}</span>
+      <span class="color-label">${names[i] || 'Color ' + (i + 1)}</span>
+    `;
+    container.appendChild(swatch);
+  });
+}
+
+// ========================
+// === THEME GENERATION
+// ========================
+function generateTheme() {
+  if (extractedColors.length < 3) {
+    showToast('Need at least 3 distinct colors to generate a theme');
+    return;
+  }
+
+  const c = window.culori;
+  if (!c) { showToast('Color library not loaded'); return; }
+
+  // Map extracted colors to semantic roles
+  const to = c.converter('oklch');
+  const fromOklch = c.converter('rgb');
+  const fmt = (color) => c.formatHex(c.converter('rgb')(color));
+
+  // Helper: adjust lightness in OKLCH
+  function adjustLightness(hex, targetL) {
+    try {
+      const oklch = to(hex);
+      if (!oklch) return hex;
+      oklch.l = targetL;
+      return fmt(oklch);
+    } catch { return hex; }
+  }
+
+  function getOklch(hex) {
+    try { return to(hex); } catch { return null; }
+  }
+
+  // Sort colors by chroma (saturation) to find accent candidate
+  const withChroma = extractedColors.map(hex => {
+    const o = getOklch(hex);
+    return { hex, chroma: o ? o.c : 0, lightness: o ? o.l : 0.5 };
+  }).sort((a, b) => b.chroma - a.chroma);
+
+  const primaryHex = withChroma[0]?.hex || '#6366f1';
+  // Secondary: second most chromatic, or light variation
+  const secondaryHex = withChroma[1]?.hex || withChroma[2]?.hex || '#8b5cf6';
+  // Accent: highest chroma for accent
+  const accentHex = withChroma.reduce((a, b) => a.chroma > b.chroma ? a : b).hex || '#f59e0b';
+
+  // Surface base: middle-lightness color
+  const sortedByLightness = [...withChroma].sort((a, b) => a.lightness - b.lightness);
+  const midIdx = Math.floor(sortedByLightness.length / 2);
+  const surfaceHex = sortedByLightness[midIdx]?.hex || '#18181b';
+  const textHex = sortedByLightness[sortedByLightness.length - 1]?.hex || '#f4f4f5';
+
+  // Generate Light theme
+  const theme = {
+    light: generateModeColors(primaryHex, secondaryHex, accentHex, surfaceHex, textHex, 'light', c),
+    dark: generateModeColors(primaryHex, secondaryHex, accentHex, surfaceHex, textHex, 'dark', c)
+  };
+
+  currentTheme = theme;
+  renderLivePreview();
+  updateExport();
+  document.getElementById('themeSection').style.display = 'block';
+}
+
+function generateModeColors(primary, secondary, accent, surface, text, mode, c) {
+  const adjustL = (hex, targetL) => {
+    try {
+      const oklch = c.converter('oklch')(hex);
+      if (!oklch) return hex;
+      oklch.l = targetL;
+      return c.formatHex(c.converter('rgb')(oklch));
+    } catch { return hex; }
+  };
+
+  const saturate = (hex, factor) => {
+    try {
+      const oklch = c.converter('oklch')(hex);
+      if (!oklch) return hex;
+      oklch.c *= factor;
+      return c.formatHex(c.converter('rgb')(oklch));
+    } catch { return hex; }
+  };
+
+  const rotateHue = (hex, degrees) => {
+    try {
+      const oklch = c.converter('oklch')(hex);
+      if (!oklch) return hex;
+      oklch.h = ((oklch.h || 0) + degrees + 360) % 360;
+      return c.formatHex(c.converter('rgb')(oklch));
+    } catch { return hex; }
+  };
+
+  if (mode === 'light') {
+    // Light mode: light surfaces, dark text
+    const bg = adjustL(surface, 0.97);
+    const card = adjustL(surface, 0.99);
+    const border = adjustL(surface, 0.85);
+    const textPrimary = adjustL(text, 0.08);
+    const textMuted = adjustL(text, 0.42);
+    const primaryFg = '#ffffff';
+    const secondaryFg = '#ffffff';
+    const accentFg = '#000000';
+    const mutedBg = adjustL(surface, 0.92);
+    const ring = c.formatHex(c.converter('rgb')({ ...c.converter('oklch')(primary), l: 0.62, c: 0.12 }));
+
+    return {
+      bg, card, border,
+      'primary': primary,
+      'primary-fg': primaryFg,
+      secondary,
+      'secondary-fg': secondaryFg,
+      accent,
+      'accent-fg': accentFg,
+      muted: textMuted,
+      'muted-bg': mutedBg,
+      text: textPrimary,
+      'text-secondary': textMuted,
+      ring,
+      destructive: '#ef4444',
+      'destructive-fg': '#ffffff',
+      input: border,
+    };
+  } else {
+    // Dark mode: dark surfaces, light text
+    const bg = adjustL(surface, 0.04);
+    const card = adjustL(surface, 0.08);
+    const border = adjustL(surface, 0.18);
+    const textPrimary = adjustL(text, 0.95);
+    const textMuted = adjustL(text, 0.6);
+    const primaryFg = '#ffffff';
+    const secondaryFg = '#ffffff';
+    const accentFg = '#ffffff';
+    const mutedBg = adjustL(surface, 0.12);
+    // Slightly brighter primary for dark mode
+    const primaryDark = adjustL(primary, 0.62);
+    const ring = c.formatHex(c.converter('rgb')({ ...c.converter('oklch')(primary), l: 0.55, c: 0.15 }));
+
+    return {
+      bg, card, border,
+      'primary': primaryDark,
+      'primary-fg': primaryFg,
+      'secondary': secondary,
+      'secondary-fg': secondaryFg,
+      'accent': accent,
+      'accent-fg': accentFg,
+      muted: textMuted,
+      'muted-bg': mutedBg,
+      text: textPrimary,
+      'text-secondary': textMuted,
+      ring,
+      destructive: '#ef4444',
+      'destructive-fg': '#ffffff',
+      input: border,
+    };
+  }
+}
+
+// ========================
+// === LIVE PREVIEW
+// ========================
+function renderLivePreview() {
+  if (!currentTheme) return;
+  const mode = currentTheme[selectedThemeMode];
+  const preview = document.getElementById('livePreview');
+
+  // Set CSS variables
+  const cssVars = Object.entries(mode).map(([key, val]) => {
+    return `--pv-${key}: ${val};`;
+  }).join('\n');
+  preview.style.cssText = cssVars;
+
+  preview.innerHTML = `
+    <div class="preview-card">
+      <h3>Welcome to Your Brand</h3>
+      <p>This is how your theme looks on real UI components. Colors automatically adapt for contrast and readability.</p>
+      <input class="preview-input" type="text" placeholder="Sample input field" value="your@email.com">
+      <div class="preview-btn-group">
+        <button class="preview-btn primary">Get Started</button>
+        <button class="preview-btn secondary">Learn More</button>
+        <button class="preview-btn outline">Docs</button>
+        <button class="preview-btn ghost">Cancel</button>
+      </div>
+      <div style="margin-top:12px">
+        <span class="preview-badge">New</span>
+        <span class="preview-badge" style="margin-left:6px;background:var(--pv-primary);color:var(--pv-primary-fg)">Featured</span>
+      </div>
+    </div>
+    <div class="preview-card-grid">
+      <div class="preview-stat">
+        <div class="num">${
+          selectedThemeMode === 'light' ? '12.4k' : '8.2k'
+        }</div>
+        <div class="label">Active Users</div>
+      </div>
+      <div class="preview-stat">
+        <div class="num">${
+          selectedThemeMode === 'light' ? '98.2' : '94.7'
+        }%</div>
+        <div class="label">Uptime</div>
+      </div>
+    </div>
+  `;
+}
+
+function switchThemeMode(mode) {
+  selectedThemeMode = mode;
+  document.querySelectorAll('#modeTabs .tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  renderLivePreview();
+  updateExport();
+}
+
+// ========================
+// === EXPORT GENERATORS
+// ========================
+let activeExportTab = 'css';
+
+function switchExportTab(tab) {
+  activeExportTab = tab;
+  document.querySelectorAll('#exportTabs .tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+  updateExport();
+}
+
+function updateExport() {
+  if (!currentTheme) return;
+  const mode = currentTheme[selectedThemeMode];
+  const allModes = currentTheme;
+  const title = document.getElementById('exportTitle');
+  const code = document.getElementById('exportCode');
+
+  switch (activeExportTab) {
+    case 'css':
+      title.textContent = 'CSS Custom Properties';
+      currentExport = generateCSS(mode);
+      break;
+    case 'tailwind':
+      title.textContent = 'Tailwind v4 Theme (@theme)';
+      currentExport = generateTailwind(allModes);
+      break;
+    case 'shadcn':
+      title.textContent = 'shadcn/ui Style';
+      currentExport = generateShadcn(allModes);
+      break;
+  }
+  code.textContent = currentExport;
+}
+
+function generateCSS(mode) {
+  let css = `/* Thema — Auto-generated theme (${selectedThemeMode}) */\n`;
+  css += `:root {\n`;
+  const entries = Object.entries(mode);
+  entries.forEach(([key, val], i) => {
+    css += `  --${key}: ${val};\n`;
+  });
+  css += `}\n`;
+
+  // Add a background/foreground usage example
+  css += `\n/* Usage Example */\n`;
+  css += `.btn-primary {\n`;
+  css += `  background: var(--primary);\n`;
+  css += `  color: var(--primary-fg);\n`;
+  css += `  border: 1px solid var(--border);\n`;
+  css += `  border-radius: 8px;\n`;
+  css += `  padding: 8px 20px;\n`;
+  css += `  font-weight: 500;\n`;
+  css += `}\n`;
+  return css;
+}
+
+function generateTailwind(allModes) {
+  let css = `/* Thema — Tailwind v4 Theme */\n`;
+  css += `@import "tailwindcss";\n\n`;
+  css += `@theme {\n`;
+
+  const light = allModes.light;
+  const dark = allModes.dark;
+
+  // Add color tokens
+  const colorKeys = ['primary', 'secondary', 'accent', 'destructive'];
+  colorKeys.forEach(key => {
+    const lVal = light[key];
+    const dVal = dark[key];
+    if (lVal) {
+      css += `  --color-${key}: ${lVal};\n`;
+    }
+  });
+
+  // Surface and text
+  ['bg', 'card', 'border', 'muted', 'muted-bg', 'ring', 'input'].forEach(key => {
+    const lVal = light[key];
+    if (lVal) {
+      css += `  --color-${key}: ${lVal};\n`;
+    }
+  });
+
+  // Foreground variants
+  ['primary-fg', 'secondary-fg', 'accent-fg', 'destructive-fg', 'text', 'text-secondary'].forEach(key => {
+    const lVal = light[key];
+    if (lVal) {
+      css += `  --color-${key}: ${lVal};\n`;
+    }
+  });
+
+  css += `}\n\n`;
+
+  // Dark mode override
+  css += `/* Dark mode overrides */\n`;
+  css += `.dark, [data-theme="dark"] {\n`;
+  Object.entries(dark).forEach(([key, val]) => {
+    css += `  --color-${key}: ${val};\n`;
+  });
+  css += `}\n`;
+
+  return css;
+}
+
+function generateShadcn(allModes) {
+  const light = allModes.light;
+  const dark = allModes.dark;
+
+  // OKLCH-ify each color
+  const c = window.culori;
+  function toOKLCH(hex) {
+    try {
+      const o = c.converter('oklch')(hex);
+      if (!o) return '';
+      return `${o.l.toFixed(3)} ${(o.c || 0).toFixed(3)} ${((o.h || 0) % 360).toFixed(2)}`;
+    } catch {
+      return '';
+    }
+  }
+
+  let css = `/* Thema — shadcn/ui Theme */\n\n`;
+
+  css += `@layer base {\n`;
+  css += `  :root {\n`;
+  // Map Thema tokens to shadcn convention
+  const shadcnMap = [
+    ['background', 'bg'],
+    ['foreground', 'text'],
+    ['card', 'card'],
+    ['card-foreground', 'text'],
+    ['popover', 'card'],
+    ['popover-foreground', 'text'],
+    ['primary', 'primary'],
+    ['primary-foreground', 'primary-fg'],
+    ['secondary', 'muted-bg'],
+    ['secondary-foreground', 'text'],
+    ['muted', 'muted-bg'],
+    ['muted-foreground', 'muted'],
+    ['accent', 'accent'],
+    ['accent-foreground', 'accent-fg'],
+    ['destructive', 'destructive'],
+    ['destructive-foreground', 'destructive-fg'],
+    ['border', 'border'],
+    ['input', 'input'],
+    ['ring', 'ring'],
+  ];
+
+  shadcnMap.forEach(([shadcnKey, themaKey]) => {
+    const val = light[themaKey];
+    if (val) {
+      const oklch = toOKLCH(val);
+      css += `    --${shadcnKey}: ${oklch || val};\n`;
+    }
+  });
+
+  css += `  }\n\n`;
+
+  css += `  .dark {\n`;
+  shadcnMap.forEach(([shadcnKey, themaKey]) => {
+    const val = dark[themaKey];
+    if (val) {
+      const oklch = toOKLCH(val);
+      css += `    --${shadcnKey}: ${oklch || val};\n`;
+    }
+  });
+  css += `  }\n`;
+  css += `}\n`;
+
+  return css;
+}
+
+// ========================
+// === COPY
+// ========================
+function copyExport() {
+  copyToClipboard(currentExport);
+  const btn = document.getElementById('copyCodeBtn');
+  btn.classList.add('copied');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+  }, 2000);
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text);
+    showToast('Copied to clipboard');
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showToast('Copied to clipboard');
+  }
+}
+
+// ========================
+// === TOAST
+// ========================
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ========================
+// === DEMO IMAGE (on first load, optionally show example)
+// ========================
+// We'll let the user upload first — no demo auto-load
+console.log('Thema v1 — Brand Theme Generator');
+console.log('Load culori:', typeof window.culori !== 'undefined' ? 'OK' : 'Missing');
+</script>
+</body>
+</html>

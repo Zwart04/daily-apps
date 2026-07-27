@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+include .gitignore
+recursive-include src/ *.py
