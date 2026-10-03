@@ -70,7 +70,9 @@ def dedupe(args):
    for name in group['duplicates']:
     source=pathlib.Path(name).resolve(strict=True)
     if not source.is_relative_to(root):raise ValueError('Path keluar dari folder yang dipilih.')
-    destination=batch/source.relative_to(root);destination.parent.mkdir(parents=True,exist_ok=True);shutil.move(str(source),str(destination));moves.append({'from':str(source),'to':str(destination)})
+    destination=batch/source.relative_to(root)
+    if not destination.resolve().is_relative_to(root):raise ValueError('Tujuan karantina keluar dari folder yang dipilih.')
+    destination.parent.mkdir(parents=True,exist_ok=True);shutil.move(str(source),str(destination));moves.append({'from':str(source),'to':str(destination)})
   if moves:(batch/'restore.json').write_text(json.dumps(moves,indent=2),encoding='utf-8')
   report.update(quarantine=str(batch) if moves else None,moved=len(moves))
  print(json.dumps(report,indent=2))

@@ -24,6 +24,26 @@
     {
       "pattern": "daily-apps-app.zwart.qzz.io",
       "custom_domain": true
+    },
+    {
+      "pattern": "habitflow-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "habitgrid-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "routineflow-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "hearth-os-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "tripforge-app.zwart.qzz.io",
+      "custom_domain": true
     }
   ]
 }
