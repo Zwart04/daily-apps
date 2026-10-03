@@ -1,0 +1,29 @@
+{
+  "name": "zwart04-daily-apps",
+  "account_id": "06403b9ad7c7c150d97e34aad884419d",
+  "main": "platform/proxy.js",
+  "compatibility_date": "2026-10-03",
+  "workers_dev": true,
+  "vars": {
+    "PRODUCT": "daily-apps",
+    "CANONICAL_HOST": "daily-apps-app.zwart.qzz.io"
+  },
+  "services": [
+    {
+      "binding": "BACKEND",
+      "service": "zwart04-platform-v2"
+    }
+  ],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": true
+  },
+  "routes": [
+    {
+      "pattern": "daily-apps-app.zwart.qzz.io",
+      "custom_domain": true
+    }
+  ]
+}

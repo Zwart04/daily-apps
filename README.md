@@ -1,39 +1,58 @@
-# Daily Apps
+# DailyOS
 
-Kumpulan aplikasi web dan tool command-line yang dibangun satu per hari oleh Hermes Agent untuk Muammar Fikri.
+Satu workspace pribadi untuk perencanaan, kebiasaan, dokumen dan alat kerja sehari-hari.
 
-Live: https://daily-apps.pages.dev
+**Online:** https://daily-apps-app.zwart.qzz.io/
 
-## Aplikasi Web (folder apps/)
+## Product workflow
 
-| Aplikasi | Deskripsi |
-|---|---|
-| warkah | Surat digital time-locked, data di URL hash, tanpa server |
-| retouch | Editor visual untuk HTML hasil AI (paste, edit, export) |
-| formie | Form builder drag-and-drop, ekspor HTML bersih |
-| thema | Generator tema warna dari gambar (CSS vars, Tailwind, shadcn/ui) |
-| crispdata | Pembersih dan konverter data (Markdown, JSON, CSV, HTML) |
-| devtoolkit-pro | 12 utilitas developer dalam satu halaman |
-| kata-kilat | Game tebak kata Bahasa Indonesia dari definisi |
-| penghitung-kurs | Konversi 22 mata uang dengan kurs live |
+Register with an email and a password of at least 12 characters. Save the recovery code, create an empty workspace, then create your own records. Owner/editor/viewer roles are enforced by the server. Invite links are limited to the specified email. Deleted records can be restored from Settings; referenced records cannot be removed until their dependencies are resolved.
 
-## Tool Command-Line (folder tools/)
+No demo records, seeded business data, fake login, simulated API success, or hard-coded metrics are included. The interface derives its counts and activity from Cloudflare D1. External providers report an error if unavailable.
 
-| Tool | Deskripsi |
-|---|---|
-| ctx | Ekstrak codebase jadi satu file konteks untuk AI assistant |
-| certwatch | Cek masa berlaku sertifikat SSL/TLS massal |
-| gittree | Operasi git massal lintas repo |
-| envdoctor | Scan dan validasi environment variable |
-| catatan-cepat | Catatan cepat dari terminal |
-| pembersih-duplikat | Cari dan hapus file duplikat |
+## Integrated modules
 
-Tool CLI dipakai dengan clone repo ini lalu ikuti README di folder masing-masing.
+- Rencana hari
+- Tugas
+- Kebiasaan
+- Check-in
+- Rutinitas
+- Sesi rutinitas
+- Target
+- Catatan
+- Anggaran
+- Perjalanan
+- Itinerary
+- Surat terjadwal
+- Dokumen & draft
+- Form online
+- Respons form
+- Alat kerja
+- Kalender
+- Bank kata
+- Kata kilat
+- Laporan
 
-## Struktur
+## Run and build
 
-- `index.html` — landing page
-- `apps/<nama>/` — aplikasi web, masing-masing berdiri sendiri
-- `tools/<nama>/` — tool CLI Python
+Requires Node.js 24.
 
-Semua konten digabung dari repo-repo harian terdahulu (Juni-Juli 2026) menjadi satu monorepo.
+```sh
+npm ci
+npm test
+npm run build
+```
+
+`npm run dev` previews the frontend. Account and record operations require the Cloudflare backend service binding; a standalone static preview does not pretend to provide a backend.
+
+## Deployment and data
+
+Cloudflare Workers serves the application and forwards `/api` through a private service binding to `zwart04-platform-v2`. That worker uses the free-tier D1 database and Workers AI where applicable. Backend source, schema, integration tests and deployment instructions are maintained in [zwart04-projects](https://github.com/Zwart04/zwart04-projects). Deploy that backend first, then run `npx wrangler deploy` here after configuring your own Cloudflare account and domain. Never put the backend PEPPER secret in GitHub or frontend code.
+
+Free services have quotas. AI is limited to 5 requests per account and 40 globally each day. No automatic paid upgrade is enabled. Back up workspace data from Settings.
+
+## Consolidation and recovery
+
+This is one rebuilt application with one workspace flow, rather than a launcher for previous variants. The pre-rebuild Git histories are preserved in the single [unified recovery backup](https://github.com/Zwart04/zwart04-projects/releases/tag/unified-rebuild-backup). See PLAN.md for scope and verified behavior.
+
+Forms have real anonymous response storage. HTML preview blocks scripts and network calls. Palette extraction reads image pixels. Exchange rates come from Frankfurter/ECB. CLI tools are unified under `python cli/daily.py --help`; duplicate-file cleanup defaults to dry-run and supports recoverable quarantine.

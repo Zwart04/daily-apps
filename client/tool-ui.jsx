@@ -1,0 +1,8 @@
+import React,{useState,useEffect} from 'react';
+import {api} from './api.js';
+export function useRecords(workspace,kinds,revision=0){const [state,set]=useState({rows:[],loading:true,error:''});const key=kinds.join(',');useEffect(()=>{let live=true;set(s=>({...s,loading:true,error:''}));(async()=>{const rows=[];for(const kind of kinds){let page=1,pages=1;do{const d=await api(`/workspaces/${workspace.id}/records/${kind}?page=${page}`);rows.push(...d.records);pages=d.pages;page++;}while(page<=pages);}if(live)set({rows,loading:false,error:''});})().catch(e=>live&&set({rows:[],loading:false,error:e.message}));return()=>{live=false;};},[workspace.id,key,revision]);return state;}
+export function Frame({title,description,children,error,busy}){return <><div className="page-heading"><div><p className="eyebrow">WORKSPACE STUDIO</p><h1>{title}</h1><p>{description}</p></div></div>{error&&<div role="alert" className="error-box">{error}</div>}{busy&&<p role="status">Memuat data workspace…</p>}{children}</>;}
+export function Blank({children}){return <div className="empty"><h3>Belum ada data</h3><p>{children||'Tambahkan data dari menu workspace untuk memulai.'}</p></div>;}
+export function Tabs({items,value,onChange}){return <div className="tool-tabs">{items.map(([id,label])=><button key={id} className={value===id?'selected':''} onClick={()=>onChange(id)}>{label}</button>)}</div>;}
+export function FileInput({accept,onFile}){return <label className="file-drop">Pilih berkas Anda<input type="file" accept={accept} onChange={e=>{const f=e.target.files?.[0];if(f)onFile(f);e.target.value='';}}/></label>;}
+export const writeAllowed=ws=>ws.role!=='viewer';
