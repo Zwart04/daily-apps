@@ -1,0 +1,46 @@
+{
+  "checked_at": "2026-10-27T07:07:32.570177+00:00",
+  "scope": "merge the original eleven public products plus catalog/backend into daily-apps",
+  "owner": "Zwart04",
+  "canonical_repository": "Zwart04/daily-apps",
+  "proposed_repository_deletions": [
+    "Zwart04/zwart04-projects",
+    "Zwart04/daganghub",
+    "Zwart04/renderforge",
+    "Zwart04/tutormind",
+    "Zwart04/servora",
+    "Zwart04/aquapure",
+    "Zwart04/clinic-os",
+    "Zwart04/legalbot-garuda",
+    "Zwart04/codeforgeme",
+    "Zwart04/gridcraft",
+    "Zwart04/stockgenie"
+  ],
+  "deletion_approved": true,
+  "remote_mutations_performed": true,
+  "protected": [
+    "agenmini",
+    "zwartos",
+    "ZwartGuard",
+    "rakaat-counter",
+    "all private repositories",
+    "repositories outside this explicit list"
+  ],
+  "requirements_before_deletion": [
+    "User approves this exact list",
+    "All source and meaningful workflows consolidated in daily-apps",
+    "Current full Git histories and the existing unified-rebuild-backup release are transferred to daily-apps and restore-tested",
+    "Existing production accounts, memberships, records and secret-dependent data preserved",
+    "One canonical login and all old URLs redirected to it",
+    "Build, functional tests, deployment and live verification pass"
+  ],
+  "existing_recovery_asset": {
+    "repository": "Zwart04/zwart04-projects",
+    "tag": "unified-rebuild-backup",
+    "file": "zwart04-unified-backup.zip",
+    "bytes": 174480351,
+    "sha256": "cb149e1567b3538c26dfaa4b1000368d292e101e56ab3f50a1daae1ab05d5bd0"
+  },
+  "approval_source": "user: oke lanjut pastikan aman",
+  "stage": "staging verified; production consolidation in progress"
+}

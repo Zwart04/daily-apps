@@ -1,0 +1,9 @@
+{
+  "node_tests": 23,
+  "node_tests_passed": 23,
+  "cli_tests": 3,
+  "cli_tests_passed": 3,
+  "production_build_passed": true,
+  "npm_audit_vulnerabilities": 0,
+  "staging_records_copied_to_production": false
+}

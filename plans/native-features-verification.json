@@ -1,0 +1,90 @@
+{
+  "staging_only": true,
+  "tools": [
+    {
+      "tool": "day-view",
+      "loaded": true
+    },
+    {
+      "tool": "daily-tools",
+      "loaded": true
+    },
+    {
+      "tool": "creative-studio",
+      "loaded": true
+    },
+    {
+      "tool": "code-studio",
+      "loaded": true
+    },
+    {
+      "tool": "level-editor",
+      "loaded": true
+    },
+    {
+      "tool": "shader-editor",
+      "loaded": true
+    },
+    {
+      "tool": "learn",
+      "loaded": true
+    },
+    {
+      "tool": "word-practice",
+      "loaded": true
+    },
+    {
+      "tool": "pricing",
+      "loaded": true
+    },
+    {
+      "tool": "route-planner",
+      "loaded": true
+    },
+    {
+      "tool": "field-map",
+      "loaded": true
+    },
+    {
+      "tool": "ingestion",
+      "loaded": true
+    },
+    {
+      "tool": "market",
+      "loaded": true
+    },
+    {
+      "tool": "dev-tools",
+      "loaded": true
+    },
+    {
+      "tool": "assistant",
+      "loaded": true
+    }
+  ],
+  "javascript_sandbox_execution": true,
+  "audio_decode_trim_export": true,
+  "sensor_authenticated_ingestion": true,
+  "server_scored_quiz": true,
+  "market": {
+    "source": "Coinbase Exchange",
+    "quoted_symbols": [
+      "ETH",
+      "BTC",
+      "SOL"
+    ]
+  },
+  "currency": {
+    "source": "Frankfurter / ECB",
+    "date": "2026-10-26"
+  },
+  "ai": {
+    "provider": "Cloudflare Workers AI",
+    "model": "Llama 3.2 3B · Cloudflare Workers AI",
+    "real_response": true
+  },
+  "console_errors": [],
+  "tile_paint_save_roundtrip": true,
+  "webgl_compiled_and_rendered": true,
+  "video_decode_trim_webm_export": true
+}

@@ -1,117 +1,1488 @@
-import {PublicForm} from './forms.jsx';
-import React,{useState,useEffect,useCallback,useRef} from 'react';import {createRoot} from 'react-dom/client';
-import {ArrowRight,ArrowUpRight,Plus,Search,ChevronDown,ChevronLeft,ChevronRight,Menu,X,LayoutDashboard,Settings,LogOut,Layers,Check,CheckCircle2,Clock,AlertCircle,Download,MoreHorizontal,Trash2,Pencil,Eye,Shield,Loader2,Users,FolderOpen,CalendarDays,Sparkles,Sun,Moon,Package,Activity,FileText} from 'lucide-react';
-import {PRODUCTS} from '../platform/definitions.js';
-import {api,setCsrf,download,money,date,dateTime,localDate,localTime,csv,labels,actionLabels} from './api.js';
-import {ToolPanel} from './tools.jsx';
-import './style.css';
-const product=PRODUCTS[__PRODUCT_ID__];
-class ToolBoundary extends React.Component {
- constructor(props){super(props);this.state={error:false};}
- static getDerivedStateFromError(){return {error:true};}
- render(){return this.state.error?<section className="panel settings-card" role="alert"><h2>Tool gagal dibuka</h2><p>Muat ulang tool untuk mencoba kembali. Data yang sudah disimpan tetap tersedia.</p><button className="primary" onClick={()=>this.setState({error:false})}>Coba kembali</button></section>:this.props.children;}
+import React, { useState, useEffect, useCallback } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  Menu,
+  X,
+  Search,
+  Sun,
+  Moon,
+  LogOut,
+  Settings,
+  ArrowUpRight,
+  ArrowRight,
+  Plus,
+  Check,
+  Play,
+  Square,
+  LayoutDashboard,
+  FolderKanban,
+  ListTodo,
+  CalendarDays,
+  Wrench,
+  Database,
+  BarChart3,
+  Clock,
+  ChevronLeft,
+  Link2,
+  Unlink,
+  RefreshCw,
+  Download,
+} from "lucide-react";
+import { PRODUCTS } from "../platform/definitions.js";
+import {
+  api,
+  setCsrf,
+  download,
+  date,
+  dateTime,
+  localDate,
+  labels,
+} from "./api.js";
+import {
+  Auth,
+  Recovery,
+  Onboarding,
+  Records,
+  RecordForm,
+  SettingsView,
+  ToolBoundary,
+  Brand,
+  ErrorBox,
+  Empty,
+  Loading,
+  Status,
+  Modal,
+} from "./legacy-ui.jsx";
+const ToolPanel = React.lazy(() =>
+  import("./tools.jsx").then((m) => ({ default: m.ToolPanel })),
+);
+import { PublicForm } from "./forms.jsx";
+import { AREA_LABELS, GROUPS, TOOLS, FLOWS } from "./catalog.js";
+import "./style.css";
+import "./workspace.css";
+const product = PRODUCTS["daily-apps"];
+const PAGES = [
+  ["today", "Hari ini", LayoutDashboard],
+  ["projects", "Proyek", FolderKanban],
+  ["tasks", "Papan tugas", ListTodo],
+  ["agenda", "Agenda", CalendarDays],
+  ["tools", "Alat kerja", Wrench],
+  ["data", "Data & operasi", Database],
+  ["reports", "Laporan", BarChart3],
+];
+const readRoute = () => {
+  try {
+    return location.hash
+      .slice(1)
+      .split("/")
+      .filter(Boolean)
+      .map(decodeURIComponent);
+  } catch {
+    return ["today"];
+  }
+};
+function useData(path, revision = 0) {
+  const [state, setState] = useState({ data: null, error: "" });
+  useEffect(() => {
+    let live = true;
+    setState({ data: null, error: "" });
+    api(path)
+      .then((data) => live && setState({ data, error: "" }))
+      .catch((e) => live && setState({ data: null, error: e.message }));
+    return () => {
+      live = false;
+    };
+  }, [path, revision]);
+  return state;
 }
-function App(){
- const [auth,setAuth]=useState(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[workspace,setWorkspace]=useState(null),[recovery,setRecovery]=useState(''),[view,setView]=useState('dashboard'),[mobile,setMobile]=useState(false),[toast,setToast]=useState(''),[revision,setRevision]=useState(0);
- const [theme,setTheme]=useState(()=>localStorage.getItem('zwart04.theme')||'light');
- const notice=useCallback(text=>{setToast(text);setTimeout(()=>setToast(''),4500);},[]);
- const refresh=()=>setRevision(v=>v+1);
- useEffect(()=>{document.documentElement.dataset.theme=theme;document.documentElement.style.setProperty('--accent',product.accent);document.title=product.name+' · '+product.tagline;localStorage.setItem('zwart04.theme',theme);},[theme]);
- useEffect(()=>{api('/auth/session').then(data=>{setAuth(data.user?data:null);setWorkspace(data.workspaces?.[0]||null);}).catch(e=>setError(e.message)).finally(()=>setLoading(false));const expired=()=>{setAuth(null);setWorkspace(null);setCsrf('');notice('Session berakhir. Silakan masuk kembali.');};window.addEventListener('session-expired',expired);return()=>window.removeEventListener('session-expired',expired);},[notice]);
- const signedIn=data=>{setAuth(data);setWorkspace(data.workspaces?.[0]||null);setRecovery(data.recoveryCode||'');setError('');};
- const logout=async()=>{try{await api('/auth/logout','POST',{});}catch(e){notice(e.message);}finally{setAuth(null);setWorkspace(null);setCsrf('');}};
- const navigate=id=>{setView(id);setMobile(false);window.scrollTo({top:0,behavior:'instant'});};
- const invite=new URLSearchParams(location.search).get('invite');
- useEffect(()=>{if(auth&&invite)api('/invitations/accept','POST',{token:invite}).then(data=>{setAuth(v=>({...v,...data}));setWorkspace(data.workspaces.at(-1));history.replaceState({},'',location.pathname);notice('Undangan diterima.');}).catch(e=>notice(e.message));},[auth?.user?.id]);
- const formToken=new URLSearchParams(location.search).get('form');if(formToken)return <PublicForm token={formToken}/>;
- if(loading)return <div className="center-screen"><Brand/><Loader2 className="spin"/><p>Memeriksa session…</p></div>;
- if(!auth)return <Auth signedIn={signedIn} initialError={error} theme={theme} toggleTheme={()=>setTheme(theme==='light'?'dark':'light')}/>;
- if(recovery)return <Recovery code={recovery} done={()=>setRecovery('')}/>;
- if(!workspace)return <Onboarding user={auth.user} created={ws=>{setWorkspace(ws);setAuth(v=>({...v,workspaces:[...(v.workspaces||[]),ws]}));}}/>;
- const context={product,workspace,user:auth.user,notice,refresh,revision,navigate};
- const current=product.modules.find(m=>m.key===view);
- return <div className="workspace-shell">
-  {mobile&&<button className="mobile-scrim" aria-label="Tutup menu" onClick={()=>setMobile(false)}/>}
-  <aside className={'sidebar '+(mobile?'open':'')}><div className="sidebar-brand"><Brand/><button className="icon-button mobile-only" onClick={()=>setMobile(false)} aria-label="Tutup"><X size={20}/></button></div>
-   <div className="workspace-picker"><span className="workspace-icon">{workspace.name.slice(0,1).toUpperCase()}</span><div><small>WORKSPACE</small><select aria-label="Workspace aktif" value={workspace.id} onChange={e=>{setWorkspace(auth.workspaces.find(w=>w.id===e.target.value));setView('dashboard');}}>{auth.workspaces.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select></div></div>
-   <nav><button className={view==='dashboard'?'selected':''} onClick={()=>navigate('dashboard')}><LayoutDashboard size={18}/><span>Overview</span></button><p className="nav-section">WORKSPACE TOOLS</p>{product.modules.map((m,i)=><button key={m.key} className={view===m.key?'selected':''} onClick={()=>navigate(m.key)}>{m.tool?<Layers size={17}/>:<FolderOpen size={17}/>}<span>{m.label}</span></button>)}</nav>
-   <div className="sidebar-bottom"><button className={view==='settings'?'selected':''} onClick={()=>navigate('settings')}><Settings size={18}/>Pengaturan & anggota</button><button onClick={()=>setTheme(theme==='light'?'dark':'light')}>{theme==='light'?<Moon size={18}/>:<Sun size={18}/>}{theme==='light'?'Mode gelap':'Mode terang'}</button><div className="sidebar-person"><span className="avatar">{auth.user.name.slice(0,2).toUpperCase()}</span><div><strong>{auth.user.name}</strong><small>{workspace.role}</small></div><button className="icon-button" aria-label="Keluar" onClick={logout}><LogOut size={17}/></button></div></div>
-  </aside>
-  <div className="main-shell"><header className="topbar"><div><button className="icon-button mobile-only" aria-label="Buka menu" onClick={()=>setMobile(true)}><Menu size={21}/></button><span className="breadcrumb">{product.name}<span>/</span><strong>{current?.label|| (view==='settings'?'Pengaturan':'Overview')}</strong></span></div><span className="connection"><i/>Data workspace · Cloudflare D1</span></header>
-   <main className="main-content">{view==='dashboard'?<Dashboard {...context}/>:view==='settings'?<SettingsView {...context} auth={auth} updateAuth={setAuth} updateWorkspace={setWorkspace}/>:current?.tool?<ToolBoundary key={view}><ToolPanel {...context} module={current}/></ToolBoundary>:current?<Records {...context} module={current}/>:<Empty title="Halaman tidak ditemukan"/>}</main>
-  </div>{toast&&<div className="toast" role="status"><CheckCircle2 size={18}/>{toast}</div>}
- </div>;
+function App() {
+  const [auth, setAuth] = useState(null),
+    [workspace, setWorkspace] = useState(null),
+    [loading, setLoading] = useState(true),
+    [error, setError] = useState(""),
+    [recovery, setRecovery] = useState(""),
+    [route, setRoute] = useState(readRoute),
+    [mobile, setMobile] = useState(false),
+    [toast, setToast] = useState(""),
+    [revision, setRevision] = useState(0),
+    [query, setQuery] = useState("");
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("zwart04.theme") || "light",
+  );
+  const notice = useCallback((text) => {
+      setToast(text);
+    }, []),
+    refresh = () => setRevision((v) => v + 1);
+  const navigate = (...path) => {
+    location.hash = path.map(encodeURIComponent).join("/");
+    setMobile(false);
+    window.scrollTo(0, 0);
+  };
+  useEffect(() => {
+    const changed = () => setRoute(readRoute());
+    window.addEventListener("hashchange", changed);
+    return () => window.removeEventListener("hashchange", changed);
+  }, []);
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(""), 5500);
+    return () => clearTimeout(timer);
+  }, [toast]);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.setProperty("--accent", "#b8d97a");
+    document.title = "Daily Workspace · Dari rencana sampai selesai";
+    localStorage.setItem("zwart04.theme", theme);
+  }, [theme]);
+  const signedIn = (data) => {
+    setAuth(data);
+    setWorkspace(
+      data.workspaces?.find(
+        (w) => w.id === localStorage.getItem("daily.workspace"),
+      ) ||
+        data.workspaces?.[0] ||
+        null,
+    );
+    setRecovery(data.recoveryCode || "");
+    setError("");
+  };
+  useEffect(() => {
+    api("/auth/session")
+      .then((d) => (d.user ? signedIn(d) : setAuth(null)))
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+    const expired = () => {
+      setAuth(null);
+      setWorkspace(null);
+      setCsrf("");
+      notice("Session berakhir. Silakan masuk kembali.");
+    };
+    window.addEventListener("session-expired", expired);
+    return () => window.removeEventListener("session-expired", expired);
+  }, [notice]);
+  useEffect(() => {
+    if (workspace) localStorage.setItem("daily.workspace", workspace.id);
+  }, [workspace?.id]);
+  const invite = new URLSearchParams(location.search).get("invite");
+  useEffect(() => {
+    if (auth && invite)
+      api("/invitations/accept", "POST", { token: invite })
+        .then((d) => {
+          setAuth((v) => ({ ...v, ...d }));
+          setWorkspace(d.workspaces.at(-1));
+          history.replaceState({}, "", location.pathname);
+          notice("Undangan diterima.");
+        })
+        .catch((e) => notice(e.message));
+  }, [auth?.user?.id, invite]);
+  const logout = async () => {
+    try {
+      await api("/auth/logout", "POST", {});
+      setAuth(null);
+      setWorkspace(null);
+      setCsrf("");
+    } catch (e) {
+      notice(e.message);
+    }
+  };
+  const token = new URLSearchParams(location.search).get("form");
+  if (token) return <PublicForm token={token} />;
+  if (loading)
+    return (
+      <div className="center-screen">
+        <Brand />
+        <Loading />
+      </div>
+    );
+  if (!auth)
+    return (
+      <Auth
+        signedIn={signedIn}
+        initialError={error}
+        theme={theme}
+        toggleTheme={() => setTheme((v) => (v === "light" ? "dark" : "light"))}
+      />
+    );
+  if (recovery)
+    return <Recovery code={recovery} done={() => setRecovery("")} />;
+  if (!workspace)
+    return (
+      <Onboarding
+        user={auth.user}
+        created={(ws) => {
+          setWorkspace(ws);
+          setAuth((v) => ({ ...v, workspaces: [...(v.workspaces || []), ws] }));
+        }}
+      />
+    );
+  const page = route[0] || "today",
+    context = {
+      product,
+      workspace,
+      user: auth.user,
+      notice,
+      refresh,
+      revision,
+      navigate,
+      openRecord: (r) =>
+        navigate("record", r.area || "daily-apps", r.kind, r.id),
+    };
+  const heading =
+    PAGES.find((p) => p[0] === page)?.[1] ||
+    {
+      project: "Detail proyek",
+      record: "Catatan",
+      tool: "Alat kerja",
+      settings: "Pengaturan",
+      search: "Pencarian",
+    }[page] ||
+    "Workspace";
+  const view =
+    page === "today" ? (
+      <Today {...context} />
+    ) : page === "projects" ? (
+      <Projects {...context} />
+    ) : page === "project" ? (
+      <Project {...context} id={route[1]} />
+    ) : page === "tasks" ? (
+      <TaskBoard {...context} />
+    ) : page === "agenda" ? (
+      <Agenda {...context} />
+    ) : page === "tools" ? (
+      <Library {...context} tools />
+    ) : page === "data" ? (
+      <Library {...context} />
+    ) : page === "reports" ? (
+      <WorkspaceReports {...context} />
+    ) : page === "record" || page === "tool" ? (
+      <AreaPane
+        {...context}
+        area={route[1]}
+        moduleKey={route[2]}
+        initialRecordId={route[3]}
+      />
+    ) : page === "settings" ? (
+      <SettingsView
+        {...context}
+        auth={auth}
+        updateAuth={setAuth}
+        updateWorkspace={setWorkspace}
+      />
+    ) : page === "search" ? (
+      <SearchResults {...context} query={route[1] || ""} />
+    ) : (
+      <Empty title="Halaman tidak ditemukan" />
+    );
+  return (
+    <div className="workspace-shell">
+      <a
+        className="skip-link"
+        href="#main-content"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("main-content").focus();
+        }}
+      >
+        Ke isi halaman
+      </a>
+      {mobile && (
+        <button
+          className="mobile-scrim"
+          aria-label="Tutup menu"
+          onClick={() => setMobile(false)}
+        />
+      )}
+      <aside
+        className={"sidebar " + (mobile ? "open" : "")}
+        aria-label="Menu utama"
+      >
+        <div className="sidebar-brand">
+          <Brand />
+          <button
+            className="icon-button mobile-only"
+            aria-label="Tutup menu"
+            onClick={() => setMobile(false)}
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <div className="workspace-picker">
+          <span className="workspace-icon">{workspace.name.slice(0, 1)}</span>
+          <div>
+            <small>RUANG KERJA</small>
+            <select
+              aria-label="Ruang kerja aktif"
+              value={workspace.id}
+              onChange={(e) => {
+                setWorkspace(
+                  auth.workspaces.find((w) => w.id === e.target.value),
+                );
+                navigate("today");
+              }}
+            >
+              {auth.workspaces.map((w) => (
+                <option key={w.id} value={w.id}>
+                  {w.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <nav>
+          {PAGES.map(([key, label, Icon]) => (
+            <button
+              key={key}
+              aria-current={page === key ? "page" : undefined}
+              className={page === key ? "selected" : ""}
+              onClick={() => navigate(key)}
+            >
+              <Icon size={18} />
+              {label}
+              {key === "today" && <span className="nav-dot" />}
+            </button>
+          ))}
+        </nav>
+        <div className="sidebar-bottom">
+          <button
+            className={page === "settings" ? "selected" : ""}
+            onClick={() => navigate("settings")}
+          >
+            <Settings size={18} />
+            Pengaturan & anggota
+          </button>
+          <button
+            onClick={() => setTheme((v) => (v === "light" ? "dark" : "light"))}
+          >
+            {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}Mode{" "}
+            {theme === "light" ? "gelap" : "terang"}
+          </button>
+          <div className="sidebar-person">
+            <span className="avatar">
+              {auth.user.name.slice(0, 2).toUpperCase()}
+            </span>
+            <div>
+              <strong>{auth.user.name}</strong>
+              <small>{workspace.role}</small>
+            </div>
+            <button
+              className="icon-button"
+              aria-label="Keluar"
+              onClick={logout}
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
+        </div>
+      </aside>
+      <div className="main-shell">
+        <header className="topbar">
+          <div>
+            <button
+              className="icon-button mobile-only"
+              aria-expanded={mobile}
+              aria-label="Buka menu"
+              onClick={() => setMobile(true)}
+            >
+              <Menu size={22} />
+            </button>
+            <span className="breadcrumb">
+              Workspace<span>/</span>
+              <strong>{heading}</strong>
+            </span>
+          </div>
+          <form
+            className="global-search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (query.trim().length >= 2) navigate("search", query.trim());
+            }}
+          >
+            <Search size={17} />
+            <input
+              aria-label="Cari di seluruh workspace"
+              placeholder="Cari pekerjaan…"
+              minLength={2}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <button aria-label="Cari">
+              <ArrowRight size={16} />
+            </button>
+          </form>
+        </header>
+        <main id="main-content" tabIndex={-1} className="main-content">
+          <ToolBoundary key={workspace.id + route.join("/")}>
+            <FocusStrip {...context} />
+            {view}
+          </ToolBoundary>
+        </main>
+      </div>
+      {toast && (
+        <div className="toast" role="status">
+          <Check size={18} />
+          {toast}
+        </div>
+      )}
+    </div>
+  );
 }
-function Brand(){return <div className="brand"><span className="brand-mark">{product.name[0]}</span><span>{product.name}</span></div>;}
-function Auth({signedIn,initialError,theme,toggleTheme}){
- const [mode,setMode]=useState('login'),[error,setError]=useState(initialError||''),[busy,setBusy]=useState(false);
- const submit=async e=>{e.preventDefault();setError('');setBusy(true);const f=Object.fromEntries(new FormData(e.currentTarget));try{signedIn(await api('/auth/'+mode,'POST',f));}catch(e){setError(e.message);}finally{setBusy(false);}};
- const title=mode==='login'?'Selamat datang kembali.':mode==='register'?'Mulai workspace Anda.':'Pulihkan akses Anda.';
- return <div className="auth-shell"><section className="auth-story"><Brand/><div className="story-content"><p className="eyebrow">YOUR WORK. ONE CLEAR WORKSPACE.</p><h1>{product.tagline}</h1><p>{product.purpose}</p><div className="story-art"><div className="art-grid"/><span className="art-orbit one"/><span className="art-orbit two"/><div className="art-card"><Layers size={26}/><strong>Satu alur.<br/>Semua terhubung.</strong><div className="art-lines"><i/><i/><i/></div></div></div></div><small>ZWART04 / BUILT WITH PURPOSE</small></section>
- <section className="auth-form-section"><button className="icon-button auth-theme" aria-label="Ganti tema" onClick={toggleTheme}>{theme==='light'?<Moon size={20}/>:<Sun size={20}/>}</button><div className="auth-card"><div className="auth-symbol"><ArrowUpRight size={26}/></div><h2>{title}</h2><p>{mode==='login'?'Masuk untuk melanjutkan pekerjaan Anda.':mode==='register'?'Buat akun dan simpan data di workspace pribadi Anda.':'Gunakan kode pemulihan yang Anda simpan saat registrasi.'}</p>
- <form onSubmit={submit}>{mode==='register'&&<label>Nama<input name="name" autoComplete="name" required maxLength={80}/></label>}<label>Email<input type="email" name="email" autoComplete="email" required maxLength={254}/></label>{mode==='recover'&&<label>Kode pemulihan<input name="code" required spellCheck="false" autoComplete="off"/></label>}<label>{mode==='recover'?'Password baru':'Password'}<input type="password" name="password" required minLength={mode==='login'?1:12} maxLength={128} autoComplete={mode==='login'?'current-password':'new-password'}/>{mode!=='login'&&<small>Minimum 12 karakter.</small>}</label>{mode==='login'&&<button type="button" className="text-button forgot" onClick={()=>{setMode('recover');setError('');}}>Lupa password?</button>}
- {error&&<ErrorBox message={error}/>}<button className="primary full" disabled={busy}>{busy?<Loader2 className="spin" size={18}/>:<>{mode==='login'?'Masuk':mode==='register'?'Buat akun':'Pulihkan akun'}<ArrowRight size={18}/></>}</button></form>
- <div className="auth-switch">{mode==='login'?'Belum punya akun?':'Sudah punya akun?'} <button className="text-button" onClick={()=>{setMode(mode==='login'?'register':'login');setError('');}}>{mode==='login'?'Daftar sekarang':'Masuk'}</button></div><div className="auth-security"><Shield size={15}/><span>Password diverifikasi server. Session memakai cookie aman.</span></div></div></section></div>;
+function Heading({ eyebrow, title, description, children }) {
+  return (
+    <div className="page-heading">
+      <div>
+        <p className="eyebrow">{eyebrow || "DAILY WORKSPACE"}</p>
+        <h1>{title}</h1>
+        {description && <p>{description}</p>}
+      </div>
+      {children}
+    </div>
+  );
 }
-function Recovery({code,done}){const [saved,setSaved]=useState(false);return <div className="center-screen"><section className="onboarding-card"><Shield className="large-icon"/><h1>Simpan kode pemulihan.</h1><p>Kode ini dapat memulihkan akses jika Anda lupa password. Simpan di tempat pribadi; jangan bagikan kepada siapa pun.</p><code className="recovery-code">{code}</code><button className="secondary full" onClick={()=>{download('kode-pemulihan-'+product.id+'.txt',code);setSaved(true);}}><Download size={18}/>Unduh kode</button><label className="check-label"><input type="checkbox" checked={saved} onChange={e=>setSaved(e.target.checked)}/>Saya sudah menyimpan kode pemulihan.</label><button className="primary full" disabled={!saved} onClick={done}>Lanjutkan<ArrowRight size={18}/></button></section></div>;}
-function Onboarding({user,created}){const [error,setError]=useState(''),[busy,setBusy]=useState(false);const submit=async e=>{e.preventDefault();setBusy(true);try{const data=await api('/workspaces','POST',{name:new FormData(e.currentTarget).get('name')});created(data.workspace);}catch(e){setError(e.message);}finally{setBusy(false);}};return <div className="center-screen"><section className="onboarding-card"><Brand/><p className="eyebrow">LANGKAH PERTAMA</p><h1>Halo, {user.name.split(' ')[0]}.<br/>Beri nama ruang kerja Anda.</h1><p>Mulai dengan workspace kosong. Anda dapat menambah data dan mengundang anggota setelah ini.</p><form onSubmit={submit}><label>Nama workspace<input name="name" required maxLength={100} autoFocus/></label>{error&&<ErrorBox message={error}/>}<button className="primary full" disabled={busy}>Buat workspace<ArrowRight size={18}/></button></form></section></div>;}
-export function ErrorBox({message}){return <div className="error-box" role="alert"><AlertCircle size={18}/><span>{message}</span></div>;}
-export function Empty({title='Belum ada data',description='Tambahkan data pertama untuk memulai.',action}){return <div className="empty"><span className="empty-icon"><FolderOpen size={28}/></span><h3>{title}</h3><p>{description}</p>{action}</div>;}
-export function Modal({title,children,close,wide=false}){const ref=useRef();useEffect(()=>{const listener=e=>{if(e.key==='Escape')close();};document.addEventListener('keydown',listener);document.body.style.overflow='hidden';ref.current?.focus();return()=>{document.removeEventListener('keydown',listener);document.body.style.overflow='';};},[]);return <div className="modal-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)close();}}><section role="dialog" aria-modal="true" aria-label={title} className={'modal '+(wide?'wide':'')} tabIndex={-1} ref={ref}><header><h2>{title}</h2><button aria-label="Tutup dialog" className="icon-button" onClick={close}><X size={20}/></button></header>{children}</section></div>;}
-function Dashboard(context){const {workspace,revision,navigate,product,user}=context;const [data,setData]=useState(null),[error,setError]=useState('');useEffect(()=>{setError('');api(`/workspaces/${workspace.id}/summary`).then(setData).catch(e=>setError(e.message));},[workspace.id,revision]);if(error)return <ErrorBox message={error}/>;if(!data)return <Loading/>;
- const groups=Object.fromEntries(product.modules.filter(m=>!m.tool).map(m=>[m.key,data.counts.filter(r=>r.kind===m.key).reduce((n,r)=>n+r.count,0)]));
- const total=data.counts.reduce((n,r)=>n+r.count,0),done=data.counts.filter(r=>['done','completed','paid','closed','published'].includes(r.status)).reduce((n,r)=>n+r.count,0),open=data.counts.filter(r=>['todo','doing','pending','unpaid','open','planned','draft','in_progress'].includes(r.status)).reduce((n,r)=>n+r.count,0);
- const first=product.modules.filter(m=>!m.tool).slice(0,4),max=Math.max(1,...data.trend.map(r=>r.count));
- return <><div className="page-heading"><div><p className="eyebrow">WORKSPACE OVERVIEW</p><h1>Halo, {user.name.split(' ')[0]}<span className="accent-dot">.</span></h1><p>Semua pekerjaan Anda, dalam satu pandangan.</p></div><button className="primary" onClick={()=>navigate(first[0].key)}><Plus size={18}/>Tambah {first[0].label.toLowerCase()}</button></div>
- <div className="dashboard-banner"><div><span className="pill">{date(new Date())}</span><h2>{product.tagline}</h2><p>{total?`${total} catatan tersimpan di workspace ${workspace.name}.`:'Workspace Anda siap. Tambahkan data nyata pertama untuk memulai.'}</p></div><div className="banner-orbit"><Layers size={38}/></div></div>
- <div className="stats-grid">{[{label:'Total catatan',value:total,icon:Layers},{label:'Perlu ditindaklanjuti',value:open,icon:Clock},{label:'Selesai / diproses',value:done,icon:CheckCircle2},{label:'Anggota & akses',value:workspace.role,icon:Users}].map(k=><div className="stat-card" key={k.label}><div><span>{k.label}</span><k.icon size={19}/></div><strong>{k.value}</strong><small>{k.label==='Anggota & akses'?'Peran dalam workspace':'Dihitung dari database workspace'}</small></div>)}</div>
- <div className="dashboard-grid"><section className="panel"><div className="panel-heading"><div><h2>Aktivitas tujuh hari</h2><p>Catatan yang dibuat, berdasarkan tanggal sebenarnya.</p></div><Activity size={20}/></div>{data.trend.length?<div className="bar-chart">{data.trend.map(row=><div key={row.date} className="bar-column"><strong>{row.count}</strong><div style={{height:Math.max(6,row.count/max*125)}}/><span>{new Date(row.date).toLocaleDateString('id-ID',{day:'numeric',month:'short'})}</span></div>)}</div>:<Empty title="Belum ada aktivitas" description="Grafik akan muncul setelah Anda menambahkan data."/>}</section>
- <section className="panel"><div className="panel-heading"><div><h2>Mulai dari sini</h2><p>Modul utama dalam alur kerja Anda.</p></div></div><div className="quick-list">{first.map(m=><button key={m.key} onClick={()=>navigate(m.key)}><span className="module-icon"><FolderOpen size={20}/></span><span><strong>{m.label}</strong><small>{groups[m.key]||0} catatan</small></span><ArrowUpRight size={18}/></button>)}</div></section></div>
- <div className="dashboard-grid"><section className="panel"><div className="panel-heading"><h2>Terakhir diperbarui</h2></div>{data.recent.length?<div className="recent-list">{data.recent.map(r=><button key={r.id} onClick={()=>navigate(r.kind)}><FileText size={18}/><span><strong>{r.title}</strong><small>{product.modules.find(m=>m.key===r.kind)?.label} · {dateTime(r.updated_at)}</small></span><Status value={r.status}/></button>)}</div>:<Empty title="Belum ada catatan" description="Data yang Anda buat akan terlihat di sini."/>}</section>
- <section className="panel"><div className="panel-heading"><h2>Riwayat workspace</h2></div><div className="activity-list">{data.activity.map((r,i)=><div key={i}><span className="activity-point"/><div><strong>{r.actor}</strong><p>{r.action.replaceAll('.',' / ')}{r.detail?' · '+r.detail:''}</p><small>{dateTime(r.created_at)}</small></div></div>)}</div></section></div>
- </>;
+function State({ data, error, children }) {
+  return error ? <ErrorBox message={error} /> : !data ? <Loading /> : children;
 }
-export const Loading=()=> <div className="loading"><Loader2 className="spin" size={22}/><span>Memuat data workspace…</span></div>;
-export const Status=({value})=><span className={'status status-'+value}>{labels[value]||value}</span>;
-function Records(context){
- const {workspace,module,product,notice,refresh,revision}=context,[data,setData]=useState(null),[error,setError]=useState(''),[search,setSearch]=useState(''),[status,setStatus]=useState(''),[page,setPage]=useState(1),[edit,setEdit]=useState(null),[detail,setDetail]=useState(null),[deleting,setDeleting]=useState(null),[acting,setActing]=useState(null);
- const editable=workspace.role!=='viewer',base=`/workspaces/${workspace.id}/records/${module.key}`;
- useEffect(()=>{setData(null);setSearch('');setStatus('');setPage(1);},[module.key,workspace.id]);
- useEffect(()=>{let live=true;const timer=setTimeout(()=>api(base+`?page=${page}&q=${encodeURIComponent(search)}&status=${status}`).then(d=>{if(live){setData(d);setError('');}}).catch(e=>{if(live)setError(e.message);}),search?250:0);return()=>{live=false;clearTimeout(timer);};},[base,page,search,status,revision]);
- const reload=()=>{refresh();setDetail(null);};const remove=async()=>{try{await api(base+'/'+deleting.id,'DELETE');setDeleting(null);reload();notice('Data dipindahkan ke sampah.');}catch(e){notice(e.message);}};
- const exportCsv=async()=>{try{const full=await api(`/workspaces/${workspace.id}/export`);download(module.key+'.csv',csv(full.records.filter(r=>r.kind===module.key),['name','status',...module.fields.filter(f=>f.key!=='name').map(f=>f.key)]),'text/csv');}catch(e){notice(e.message);}};
- return <><div className="page-heading"><div><p className="eyebrow">{product.name.toUpperCase()}</p><h1>{module.label}</h1><p>Kelola data {module.label.toLowerCase()} yang tersimpan di workspace Anda.</p></div><div className="button-group"><button className="secondary" onClick={exportCsv}><Download size={17}/>Ekspor CSV</button>{editable&&!['attempts','form_responses'].includes(module.key)&&<button className="primary" onClick={()=>setEdit({})}><Plus size={17}/>Tambah data</button>}</div></div>
- <section className="panel records-panel"><div className="list-toolbar"><label className="search-field"><Search size={18}/><input aria-label="Cari data" placeholder="Cari data…" value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}}/></label><select aria-label="Filter status" value={status} onChange={e=>{setStatus(e.target.value);setPage(1);}}><option value="">Semua status</option>{module.statuses.map(s=><option key={s} value={s}>{labels[s]||s}</option>)}</select><span className="list-count">{data?.total??'…'} catatan</span></div>
- {error?<ErrorBox message={error}/>:!data?<Loading/>:data.records.length?<><div className="table-wrap"><table><thead><tr><th>Nama</th>{module.fields.filter(f=>f.key!=='name'&&!['textarea','code','json','items','quiz'].includes(f.type)).slice(0,3).map(f=><th key={f.key}>{f.label}</th>)}<th>Status</th><th>Diperbarui</th><th/></tr></thead><tbody>{data.records.map(r=><tr key={r.id}><td><button className="record-name" onClick={()=>setDetail(r)}>{r.title}</button></td>{module.fields.filter(f=>f.key!=='name'&&!['textarea','code','json','items','quiz'].includes(f.type)).slice(0,3).map(f=><td key={f.key}>{displayValue(f,r.data[f.key],product.currency,false,r.referenceNames)}</td>)}<td><Status value={r.status}/></td><td className="muted nowrap">{date(r.updated_at)}</td><td><div className="row-actions"><button className="icon-button" aria-label={'Lihat '+r.title} onClick={()=>setDetail(r)}><Eye size={16}/></button>{editable&&<><button className="icon-button" aria-label={'Edit '+r.title} onClick={()=>setEdit(r)} disabled={r.data.locked||['attempts','form_responses'].includes(module.key)}><Pencil size={16}/></button><button className="icon-button danger-text" aria-label={'Hapus '+r.title} onClick={()=>setDeleting(r)}><Trash2 size={16}/></button></>}</div></td></tr>)}</tbody></table></div><div className="pagination"><span>Halaman {data.page} dari {data.pages||1}</span><div><button className="icon-button" aria-label="Halaman sebelumnya" disabled={page<=1} onClick={()=>setPage(page-1)}><ChevronLeft size={18}/></button><button className="icon-button" aria-label="Halaman berikutnya" disabled={page>=data.pages} onClick={()=>setPage(page+1)}><ChevronRight size={18}/></button></div></div></>:<Empty title={'Belum ada '+module.label.toLowerCase()} description={search?'Tidak ada hasil yang cocok.':'Tambahkan data nyata untuk memulai. Tidak ada data contoh di workspace ini.'} action={editable&&!['attempts','form_responses'].includes(module.key)?<button className="primary" onClick={()=>setEdit({})}><Plus size={17}/>Tambah data pertama</button>:null}/>}</section>
- {edit&&<RecordForm {...context} record={edit} close={()=>setEdit(null)} saved={()=>{setEdit(null);reload();notice('Data berhasil disimpan di server.');}}/>}
- {detail&&<Modal title={detail.title} close={()=>setDetail(null)} wide><div className="record-detail"><Status value={detail.status}/><dl>{module.fields.map(f=><div key={f.key}><dt>{f.label}</dt><dd>{f.key==='body'&&detail.data.locked?'Surat terkunci sampai '+dateTime(detail.data.unlock_at):displayValue(f,detail.data[f.key],product.currency,true,detail.referenceNames)}</dd></div>)}</dl>{editable&&module.actions?.length>0&&<div className="workflow-actions"><h3>Alur kerja</h3>{module.actions.map(action=><button key={action} className="secondary" onClick={()=>setActing({action,record:detail})}>{actionLabels[action]}</button>)}</div>}</div></Modal>}
- {deleting&&<Modal title="Hapus data?" close={()=>setDeleting(null)}><div className="modal-body"><p>{deleting.title} akan dipindahkan ke sampah dan dapat dipulihkan dari Pengaturan.</p><div className="modal-footer"><button className="secondary" onClick={()=>setDeleting(null)}>Batal</button><button className="danger" onClick={remove}>Hapus data</button></div></div></Modal>}
- {acting&&<ActionDialog {...context} {...acting} close={()=>setActing(null)} saved={()=>{setActing(null);reload();}}/>}
- </>;
+function Row({ record, openRecord, extra }) {
+  return (
+    <div className="work-row">
+      <button onClick={() => openRecord(record)}>
+        <strong>{record.title}</strong>
+        <small>
+          {AREA_LABELS[record.area || "daily-apps"]} ·{" "}
+          {
+            PRODUCTS[record.area || "daily-apps"]?.modules.find(
+              (m) => m.key === record.kind,
+            )?.label
+          }
+        </small>
+      </button>
+      {extra || <Status value={record.status} />}
+      <button
+        className="icon-button"
+        aria-label={"Buka " + record.title}
+        onClick={() => openRecord(record)}
+      >
+        <ArrowUpRight size={17} />
+      </button>
+    </div>
+  );
 }
-function displayValue(field,value,currency,long=false,references={}){if(value===undefined||value===null||value==='')return '—';if(field.type==='money')return money(value,currency);if(field.type==='date')return date(value);if(field.type==='datetime')return dateTime(value);if(['json','items','quiz'].includes(field.type))return long?<pre>{JSON.stringify(value,null,2)}</pre>:'Data terstruktur';if(field.type==='ref')return references?.[value]||String(value);return long?<span className="pre-wrap">{String(value)}</span>:String(value).slice(0,70);}
-function RecordForm({record,module,workspace,product,close,saved}){
- const [values,setValues]=useState(()=>Object.fromEntries(module.fields.map(f=>{let value=record.data?.[f.key]??(['number','money'].includes(f.type)?'':['items','quiz','json'].includes(f.type)?[]:f.type==='date'?localDate():'');if(f.type==='money'&&value!=='')value/=100;if(f.type==='datetime')value=localTime(value);return [f.key,value];}))),[status,setStatus]=useState(record.status||module.statuses[0]),[options,setOptions]=useState([]),[error,setError]=useState(''),[busy,setBusy]=useState(false);
- useEffect(()=>{if(module.fields.some(f=>['ref','items'].includes(f.type)))api(`/workspaces/${workspace.id}/options`).then(d=>setOptions(d.records)).catch(e=>setError(e.message));},[]);
- const change=(key,value)=>setValues(v=>({...v,[key]:value}));
- const submit=async e=>{e.preventDefault();setBusy(true);setError('');try{const data={...values,status,version:record.version};for(const f of module.fields){const val=data[f.key];if(f.type==='number'){if(val==='')delete data[f.key];else data[f.key]=Number(val);}if(f.type==='money'){if(val==='')delete data[f.key];else data[f.key]=Math.round(Number(val)*100);}if(f.type==='datetime'&&val)data[f.key]=new Date(val).toISOString();if(f.type==='json'&&typeof val==='string')data[f.key]=JSON.parse(val);}await api(`/workspaces/${workspace.id}/records/${module.key}`+(record.id?'/'+record.id:''),record.id?'PUT':'POST',data);saved();}catch(e){setError(e.message);}finally{setBusy(false);}};
- return <Modal title={(record.id?'Edit ':'Tambah ')+module.label.toLowerCase()} close={close} wide><form className="record-form" onSubmit={submit}><div className="form-grid">{module.fields.map(f=><label key={f.key} className={['textarea','code','items','quiz','json'].includes(f.type)?'span-two':''}>{f.label}{f.required&&<span className="required">*</span>}{f.type==='ref'?<select required={f.required} value={values[f.key]} onChange={e=>change(f.key,e.target.value)}><option value="">Pilih {f.label.toLowerCase()}</option>{options.filter(o=>o.kind===f.ref).map(o=><option key={o.id} value={o.id}>{o.title}</option>)}</select>:f.type==='select'?<select value={values[f.key]} onChange={e=>change(f.key,e.target.value)}><option value="">Pilih…</option>{f.options.map(s=><option key={s} value={s}>{s}</option>)}</select>:f.type==='items'?<ItemFields value={values[f.key]} onChange={v=>change(f.key,v)} options={options.filter(o=>o.kind==='products')}/>:f.type==='quiz'?<QuizFields value={values[f.key]} onChange={v=>change(f.key,v)}/>:['textarea','code','json'].includes(f.type)?<textarea className={f.type==='code'||f.type==='json'?'code-input':''} rows={f.type==='code'?12:5} required={f.required} value={typeof values[f.key]==='object'?JSON.stringify(values[f.key],null,2):values[f.key]} onChange={e=>change(f.key,e.target.value)} spellCheck={f.type==='textarea'}/>:<input type={f.type==='money'||f.type==='number'?'number':f.type==='datetime'?'datetime-local':f.type==='url'?'url':f.type==='email'?'email':f.type==='color'?'color':f.type==='time'?'time':f.type==='date'?'date':'text'} min={f.type==='money'?0:f.min} max={f.max} step={f.type==='money'?'.01':'any'} value={values[f.key]} required={f.required} onChange={e=>change(f.key,e.target.value)}/>}</label>)}{!['orders','stock_movements','letters'].includes(module.key)&&<label>Status<select value={status} onChange={e=>setStatus(e.target.value)}>{module.statuses.map(s=><option key={s} value={s}>{labels[s]||s}</option>)}</select></label>}</div>{error&&<ErrorBox message={error}/>}<div className="modal-footer"><button type="button" className="secondary" onClick={close}>Batal</button><button className="primary" disabled={busy}>{busy?<Loader2 className="spin" size={18}/>:<Check size={18}/>}Simpan data</button></div></form></Modal>;
+function Today(c) {
+  const { workspace, revision, user, navigate, openRecord } = c,
+    { data, error } = useData(
+      `/workspaces/${workspace.id}/hub?today=${localDate()}`,
+      revision,
+    );
+  return (
+    <>
+      <Heading
+        eyebrow={date(new Date()).toUpperCase()}
+        title={"Selamat bekerja, " + user.name.split(" ")[0] + "."}
+        description="Satu tempat untuk merencanakan, membuat, dan menyelesaikan pekerjaan."
+      >
+        <button className="primary" onClick={() => navigate("projects")}>
+          <Plus size={17} />
+          Mulai proyek
+        </button>
+      </Heading>
+      <State data={data} error={error}>
+        {data && (
+          <>
+            <section className="daily-hero">
+              <div>
+                <span className="pill">RUANG UNTUK PROGRES</span>
+                <h2>
+                  Dari rencana
+                  <br />
+                  sampai selesai<span>.</span>
+                </h2>
+                <p>
+                  {data.total
+                    ? `${data.total} catatan pekerjaan Anda, terhubung dalam satu ruang.`
+                    : "Mulai dengan tujuan Anda. Susun tugas, kerjakan, lalu tautkan hasilnya ke proyek."}
+                </p>
+                <button className="hero-link" onClick={() => navigate("tasks")}>
+                  Buka papan tugas <ArrowRight size={18} />
+                </button>
+              </div>
+              <div className="hero-graphic" aria-hidden="true">
+                <div className="orbit-ring" />
+                <div className="orbit-ring inner" />
+                <span className="orbit-core">
+                  <Check size={38} />
+                </span>
+                <span className="orbit-tag plan">Rencanakan</span>
+                <span className="orbit-tag create">Kerjakan</span>
+                <span className="orbit-tag done">Selesaikan</span>
+              </div>
+            </section>
+            <div className="overview-metrics">
+              <Metric
+                label="Proyek aktif"
+                value={
+                  data.projects.filter((p) => p.status === "active").length
+                }
+              />
+              <Metric label="Tugas jatuh tempo" value={data.due.length} />
+              <Metric label="Catatan tersimpan" value={data.total} />
+              <Metric label="Catatan selesai" value={data.done} />
+            </div>
+            <div className="dashboard-grid">
+              <section className="panel">
+                <div className="panel-heading">
+                  <div>
+                    <h2>Prioritas hari ini</h2>
+                    <p>Tugas hari ini dan yang melewati tenggat.</p>
+                  </div>
+                  <button
+                    className="text-button"
+                    onClick={() => navigate("tasks")}
+                  >
+                    Lihat semua
+                  </button>
+                </div>
+                {data.due.length ? (
+                  <div className="work-list">
+                    {data.due.map((r) => (
+                      <Row
+                        key={r.id}
+                        record={r}
+                        openRecord={openRecord}
+                        extra={
+                          <span className="pill">{date(r.data.date)}</span>
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Empty
+                    title="Tidak ada tugas jatuh tempo"
+                    description="Susun tugas dan tentukan tanggalnya di papan tugas."
+                    action={
+                      <button
+                        className="secondary"
+                        onClick={() => navigate("tasks")}
+                      >
+                        Susun tugas
+                      </button>
+                    }
+                  />
+                )}
+              </section>
+              <section className="panel">
+                <div className="panel-heading">
+                  <h2>Alur kerja Anda</h2>
+                </div>
+                <div className="journey-list">
+                  {[
+                    [
+                      "01",
+                      "Rencanakan",
+                      "Tentukan proyek dan hasil yang ingin dicapai.",
+                      "projects",
+                    ],
+                    [
+                      "02",
+                      "Kerjakan",
+                      "Pilih tugas, gunakan alat kerja, dan catat waktu.",
+                      "tools",
+                    ],
+                    [
+                      "03",
+                      "Hubungkan hasil",
+                      "Tautkan catatan atau hasil kerja ke proyek.",
+                      "projects",
+                    ],
+                  ].map(([n, title, desc, to]) => (
+                    <button key={n} onClick={() => navigate(to)}>
+                      <span>{n}</span>
+                      <div>
+                        <strong>{title}</strong>
+                        <p>{desc}</p>
+                      </div>
+                      <ArrowUpRight size={17} />
+                    </button>
+                  ))}
+                </div>
+              </section>
+            </div>
+            <section className="panel">
+              <div className="panel-heading">
+                <h2>Terakhir dikerjakan</h2>
+                <Clock size={18} />
+              </div>
+              {data.recent.length ? (
+                <div className="work-list">
+                  {data.recent.map((r) => (
+                    <Row key={r.id} record={r} openRecord={openRecord} />
+                  ))}
+                </div>
+              ) : (
+                <Empty
+                  title="Belum ada pekerjaan"
+                  description="Semua angka dan aktivitas di sini berasal dari data Anda sendiri."
+                />
+              )}
+            </section>
+            {data.truncated && (
+              <p className="muted">
+                Ringkasan detail menampilkan 5.000 catatan terbaru; jumlah total
+                mencakup seluruh data.
+              </p>
+            )}
+          </>
+        )}
+      </State>
+    </>
+  );
 }
-function ItemFields({value,onChange,options}){const rows=Array.isArray(value)?value:[];return <div className="nested-fields">{rows.map((row,i)=><div key={i}><select required aria-label="Produk item" value={row.product_id} onChange={e=>onChange(rows.map((r,n)=>n===i?{...r,product_id:e.target.value}:r))}><option value="">Pilih produk</option>{options.map(o=><option value={o.id} key={o.id}>{o.title}</option>)}</select><input type="number" min="1" max="100000" aria-label="Jumlah item" value={row.quantity} onChange={e=>onChange(rows.map((r,n)=>n===i?{...r,quantity:Number(e.target.value)}:r))}/><button type="button" className="icon-button" aria-label="Hapus item" onClick={()=>onChange(rows.filter((_,n)=>n!==i))}><X size={17}/></button></div>)}<button type="button" className="secondary small" disabled={rows.length>=20} onClick={()=>onChange([...rows,{product_id:'',quantity:1}])}><Plus size={15}/>Tambah item</button><small>Harga diambil dari produk oleh server saat pesanan disimpan.</small></div>;}
-function QuizFields({value,onChange}){const rows=Array.isArray(value)?value:[];const change=(i,key,v)=>onChange(rows.map((r,n)=>n===i?{...r,[key]:v}:r));return <div className="quiz-builder">{rows.map((q,i)=><section key={i}><strong>Pertanyaan {i+1}</strong><input aria-label="Pertanyaan" value={q.question} required onChange={e=>change(i,'question',e.target.value)}/>{q.options.map((s,j)=><div key={j}><input type="radio" aria-label={'Jawaban benar '+(j+1)} checked={q.correct===j} onChange={()=>change(i,'correct',j)}/><input aria-label={'Pilihan '+(j+1)} required value={s} onChange={e=>change(i,'options',q.options.map((v,n)=>n===j?e.target.value:v))}/></div>)}<button type="button" className="text-button danger-text" onClick={()=>onChange(rows.filter((_,n)=>n!==i))}>Hapus pertanyaan</button></section>)}<button type="button" className="secondary" onClick={()=>onChange([...rows,{question:'',options:['','','',''],correct:0}])}><Plus size={16}/>Tambah pertanyaan</button></div>;}
-function ActionDialog({action,record,workspace,notice,close,saved}){const [error,setError]=useState(''),[busy,setBusy]=useState(false);const submit=async e=>{e.preventDefault();setBusy(true);try{const data=await api(`/workspaces/${workspace.id}/actions/${action}`,'POST',{id:record.id,...Object.fromEntries(new FormData(e.currentTarget))});if(data.url){await navigator.clipboard.writeText(data.url).catch(()=>{});notice('Tautan form: '+data.url);}else notice(data.idempotent?'Aksi ini sudah pernah diproses; tidak diulang.':'Workflow berhasil diproses.');saved();}catch(e){setError(e.message);}finally{setBusy(false);}};return <Modal title={actionLabels[action]} close={close}><form className="modal-body" onSubmit={submit}><p>{record.title}</p>{action==='ship-order'&&<><label>Kurir<input name="carrier" required/></label><label>Nomor resi<input name="tracking" required/></label></>}{action==='invoice-order'&&<label>Jatuh tempo<input type="date" name="due_date" required defaultValue={localDate()}/></label>}{action==='pay-order'&&<p className="callout">Gunakan setelah pembayaran benar-benar Anda terima. Ini mencatat pembayaran; tidak memindahkan uang.</p>}{error&&<ErrorBox message={error}/>}<div className="modal-footer"><button type="button" className="secondary" onClick={close}>Batal</button><button className="primary" disabled={busy}>Proses aksi<ArrowRight size={17}/></button></div></form></Modal>;}
-function SettingsView({workspace,user,notice,auth,updateAuth,updateWorkspace,revision,refresh}){
- const [members,setMembers]=useState([]),[trash,setTrash]=useState([]),[audit,setAudit]=useState([]),[invite,setInvite]=useState(''),[error,setError]=useState('');
- useEffect(()=>{Promise.all([api(`/workspaces/${workspace.id}/members`),api(`/workspaces/${workspace.id}/trash`),api(`/workspaces/${workspace.id}/audit`)]).then(([m,t,a])=>{setMembers(m.members);setTrash(t.records);setAudit(a.entries);}).catch(e=>setError(e.message));},[workspace.id,revision]);
- const submit=handler=>async e=>{e.preventDefault();setError('');try{await handler(Object.fromEntries(new FormData(e.currentTarget)));notice('Perubahan berhasil disimpan.');}catch(e){setError(e.message);}};
- const exportData=async()=>{try{download(product.id+'-workspace.json',JSON.stringify(await api(`/workspaces/${workspace.id}/export`),null,2),'application/json');}catch(e){setError(e.message);}};
- return <><div className="page-heading"><div><p className="eyebrow">WORKSPACE CONTROL</p><h1>Pengaturan</h1><p>Akun, anggota, akses, dan data workspace.</p></div><button className="secondary" onClick={exportData}><Download size={17}/>Backup data JSON</button></div>{error&&<ErrorBox message={error}/>}
- <div className="settings-grid"><section className="panel settings-card"><h2>Profil akun</h2><form onSubmit={submit(async f=>{const d=await api('/auth/profile','PATCH',f);updateAuth(v=>({...v,user:d.user}));})}><label>Nama<input name="name" defaultValue={user.name} required maxLength={80}/></label><label>Email<input value={user.email} disabled readOnly/></label><button className="primary small">Simpan profil</button></form></section><section className="panel settings-card"><h2>Ubah password</h2><form onSubmit={submit(async f=>{await api('/auth/password','POST',f);})}><label>Password saat ini<input type="password" name="current" required autoComplete="current-password"/></label><label>Password baru<input type="password" name="password" required minLength={12} autoComplete="new-password"/></label><small>Session lain akan dicabut setelah perubahan.</small><button className="primary small">Ubah password</button></form></section></div>
- {workspace.role==='owner'&&<div className="settings-grid"><section className="panel settings-card"><h2>Nama workspace</h2><form onSubmit={submit(async f=>{const d=await api(`/workspaces/${workspace.id}`,'PATCH',f);updateWorkspace(d.workspace);updateAuth(v=>({...v,workspaces:v.workspaces.map(w=>w.id===workspace.id?{...w,name:d.workspace.name}:w)}));})}><label>Nama<input name="name" defaultValue={workspace.name} required/></label><button className="primary small">Simpan</button></form></section><section className="panel settings-card"><h2>Undang anggota</h2><form onSubmit={submit(async f=>{const d=await api(`/workspaces/${workspace.id}/invitations`,'POST',f);setInvite(d.url);})}><label>Email tujuan<input type="email" name="email" required/></label><label>Peran<select name="role"><option value="editor">Editor — baca dan ubah data</option><option value="viewer">Viewer — baca data</option></select></label><button className="primary small">Buat tautan undangan</button></form>{invite&&<div className="callout"><p>Bagikan tautan ini kepada pemilik email tujuan. Berlaku tujuh hari.</p><input readOnly value={invite}/><button className="text-button" onClick={()=>navigator.clipboard.writeText(invite).then(()=>notice('Tautan disalin.')).catch(()=>setError('Tidak dapat menyalin; salin tautan secara manual.'))}>Salin tautan</button></div>}</section></div>}
- <section className="panel settings-card"><h2>Buat workspace baru</h2><p>Pisahkan data tim atau kegiatan Anda dalam produk yang sama.</p><form onSubmit={submit(async f=>{const d=await api('/workspaces','POST',f);updateAuth(v=>({...v,workspaces:[...v.workspaces,d.workspace]}));updateWorkspace(d.workspace);})}><label>Nama workspace baru<input name="name" required maxLength={100}/></label><button className="primary small">Buat workspace kosong</button></form></section>
- <section className="panel settings-card"><h2>Anggota workspace</h2><div className="member-list">{members.map(m=><div key={m.id}><span className="avatar">{m.name.slice(0,2).toUpperCase()}</span><span><strong>{m.name}</strong><small>{m.email}</small></span>{workspace.role==='owner'&&m.role!=='owner'?<select aria-label={'Peran '+m.name} value={m.role} onChange={e=>api(`/workspaces/${workspace.id}/members`,'PATCH',{id:m.id,role:e.target.value}).then(refresh).catch(e=>setError(e.message))}><option value="editor">editor</option><option value="viewer">viewer</option></select>:<span className="pill">{m.role}</span>}{workspace.role==='owner'&&m.role!=='owner'&&<button className="text-button danger-text" onClick={()=>api(`/workspaces/${workspace.id}/members/${m.id}`,'DELETE').then(()=>{refresh();notice('Akses anggota dicabut.');}).catch(e=>setError(e.message))}>Cabut akses</button>}</div>)}</div></section>
- <section className="panel settings-card"><h2>Sampah</h2><p>Data yang dihapus dapat dipulihkan di sini.</p>{trash.length?<div className="recent-list">{trash.map(r=><div key={r.id}><FileText size={18}/><span><strong>{r.title}</strong><small>{dateTime(r.deleted_at)}</small></span>{workspace.role!=='viewer'&&<button className="secondary small" onClick={()=>api(`/workspaces/${workspace.id}/restore/${r.id}`,'POST',{}).then(()=>{refresh();notice('Data dipulihkan.');}).catch(e=>setError(e.message))}>Pulihkan</button>}</div>)}</div>:<p className="muted">Sampah kosong.</p>}</section>
- <section className="panel settings-card"><h2>Audit perubahan</h2><div className="table-wrap"><table><thead><tr><th>Waktu</th><th>Pelaku</th><th>Aksi</th><th>Detail</th></tr></thead><tbody>{audit.map(a=><tr key={a.id}><td>{dateTime(a.created_at)}</td><td>{a.actor}</td><td>{a.action}</td><td>{a.detail||'—'}</td></tr>)}</tbody></table></div></section>
- </>;
+function Metric({ label, value }) {
+  return (
+    <div>
+      <small>{label}</small>
+      <strong>{value}</strong>
+    </div>
+  );
 }
-createRoot(document.getElementById('root')).render(<App/>);
+function Projects(c) {
+  const { workspace, revision, navigate } = c,
+    { data, error } = useData(
+      `/workspaces/${workspace.id}/records/projects?page=1`,
+      revision,
+    ),
+    [editing, setEditing] = useState(false),
+    module = product.modules.find((m) => m.key === "projects");
+  return (
+    <>
+      <Heading
+        title="Bangun sesuatu yang berarti."
+        description="Satukan tugas, waktu kerja, dan hasil dari seluruh bidang dalam sebuah proyek."
+      >
+        {workspace.role !== "viewer" && (
+          <button className="primary" onClick={() => setEditing(true)}>
+            <Plus size={17} />
+            Proyek baru
+          </button>
+        )}
+      </Heading>
+      <State data={data} error={error}>
+        {data?.records.length ? (
+          <div className="project-grid">
+            {data.records.map((r) => (
+              <button
+                className="panel project-card"
+                key={r.id}
+                onClick={() => navigate("project", r.id)}
+              >
+                <span className="project-symbol">
+                  <FolderKanban size={24} />
+                </span>
+                <Status value={r.status} />
+                <h2>{r.title}</h2>
+                <p>
+                  {r.data.description ||
+                    "Buka proyek untuk menyusun tugas dan menghubungkan hasil kerja."}
+                </p>
+                <footer>
+                  <span>
+                    {r.data.deadline
+                      ? "Tenggat " + date(r.data.deadline)
+                      : "Tanpa tenggat"}
+                  </span>
+                  <ArrowUpRight size={18} />
+                </footer>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <Empty
+            title="Proyek pertama dimulai dari sini"
+            description="Tentukan tujuan nyata, uraikan menjadi tugas, dan kumpulkan hasil pekerjaan Anda."
+            action={
+              workspace.role !== "viewer" && (
+                <button className="primary" onClick={() => setEditing(true)}>
+                  Buat proyek
+                </button>
+              )
+            }
+          />
+        )}
+        {data?.pages > 1 && (
+          <button
+            className="secondary"
+            onClick={() => navigate("record", "daily-apps", "projects")}
+          >
+            Lihat seluruh {data.total} proyek
+          </button>
+        )}
+      </State>
+      {editing && (
+        <RecordForm
+          {...c}
+          module={module}
+          record={{}}
+          close={() => setEditing(false)}
+          saved={() => {
+            setEditing(false);
+            c.refresh();
+            c.notice("Proyek dibuat.");
+          }}
+        />
+      )}
+    </>
+  );
+}
+function Project(c) {
+  const { workspace, id, revision, refresh, notice, navigate, openRecord } = c,
+    { data, error } = useData(
+      `/workspaces/${workspace.id}/projects/${id}/hub`,
+      revision,
+    ),
+    [edit, setEdit] = useState(false),
+    [addTask, setAddTask] = useState(false),
+    [linking, setLinking] = useState(false);
+  return (
+    <>
+      <button
+        className="text-button back-link"
+        onClick={() => navigate("projects")}
+      >
+        <ChevronLeft size={16} />
+        Semua proyek
+      </button>
+      <State data={data} error={error}>
+        {data && (
+          <>
+            <Heading
+              eyebrow="PROYEK TERHUBUNG"
+              title={data.project.title}
+              description={data.project.data.description}
+            >
+              {workspace.role !== "viewer" && (
+                <button className="secondary" onClick={() => setEdit(true)}>
+                  Edit proyek
+                </button>
+              )}
+            </Heading>
+            <div className="overview-metrics">
+              <Metric
+                label="Tugas selesai"
+                value={`${data.progress.done}/${data.progress.total}`}
+              />
+              <Metric
+                label="Waktu fokus"
+                value={duration(data.focus_seconds)}
+              />
+              <Metric label="Hasil terhubung" value={data.links.length} />
+              <Metric
+                label="Tenggat"
+                value={date(data.project.data.deadline)}
+              />
+            </div>
+            <div className="project-progress">
+              <div
+                style={{
+                  width:
+                    (data.progress.total
+                      ? (100 * data.progress.done) / data.progress.total
+                      : 0) + "%",
+                }}
+              />
+            </div>
+            <div className="dashboard-grid">
+              <section className="panel">
+                <div className="panel-heading">
+                  <h2>Rencana & pelaksanaan</h2>
+                  {workspace.role !== "viewer" && (
+                    <button
+                      className="secondary small"
+                      onClick={() => setAddTask(true)}
+                    >
+                      <Plus size={15} />
+                      Tugas
+                    </button>
+                  )}
+                </div>
+                <TaskColumns {...c} rows={data.tasks} />
+              </section>
+              <section className="panel">
+                <div className="panel-heading">
+                  <h2>Hasil pekerjaan</h2>
+                  {workspace.role !== "viewer" && (
+                    <button
+                      className="secondary small"
+                      onClick={() => setLinking(true)}
+                    >
+                      <Link2 size={15} />
+                      Tautkan
+                    </button>
+                  )}
+                </div>
+                {data.links.length ? (
+                  <div className="work-list">
+                    {data.links.map((r) => (
+                      <Row
+                        key={r.id}
+                        record={r}
+                        openRecord={openRecord}
+                        extra={
+                          workspace.role !== "viewer" ? (
+                            <button
+                              className="icon-button"
+                              aria-label={"Lepaskan " + r.title}
+                              onClick={() =>
+                                api(
+                                  `/workspaces/${workspace.id}/projects/${id}/links/${r.id}`,
+                                  "DELETE",
+                                )
+                                  .then(refresh)
+                                  .catch((e) => notice(e.message))
+                              }
+                            >
+                              <Unlink size={17} />
+                            </button>
+                          ) : null
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Empty
+                    title="Hubungkan pekerjaan Anda"
+                    description="Tautkan pesanan, dokumen, materi belajar, atau hasil studio yang sudah Anda simpan."
+                    action={
+                      <button
+                        className="secondary"
+                        onClick={() => navigate("tools")}
+                      >
+                        Buka alat kerja
+                      </button>
+                    }
+                  />
+                )}
+              </section>
+            </div>
+            {edit && (
+              <RecordForm
+                {...c}
+                module={product.modules.find((m) => m.key === "projects")}
+                record={data.project}
+                close={() => setEdit(false)}
+                saved={() => {
+                  setEdit(false);
+                  refresh();
+                }}
+              />
+            )}
+            {addTask && (
+              <RecordForm
+                {...c}
+                module={product.modules.find((m) => m.key === "tasks")}
+                record={{ data: { project_id: id } }}
+                close={() => setAddTask(false)}
+                saved={() => {
+                  setAddTask(false);
+                  refresh();
+                }}
+              />
+            )}
+            {linking && <LinkResults {...c} close={() => setLinking(false)} />}
+          </>
+        )}
+      </State>
+    </>
+  );
+}
+function LinkResults({ workspace, id, close, refresh, notice }) {
+  const [q, setQ] = useState(""),
+    [search, setSearch] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setSearch(q), 250);
+    return () => clearTimeout(timer);
+  }, [q]);
+  const { data, error } = useData(
+    `/workspaces/${workspace.id}/hub/search?q=${encodeURIComponent(search)}`,
+  );
+  return (
+    <Modal title="Tautkan hasil pekerjaan" close={close}>
+      <div className="modal-body">
+        <label>
+          Cari nama catatan
+          <input
+            autoFocus
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Minimal 2 karakter"
+          />
+        </label>
+        {error && <ErrorBox message={error} />}
+        <div className="work-list">
+          {data?.records
+            .filter((r) => r.id !== id)
+            .map((r) => (
+              <div className="work-row" key={r.id}>
+                <span>
+                  <strong>{r.title}</strong>
+                  <small>{AREA_LABELS[r.area]}</small>
+                </span>
+                <button
+                  className="secondary small"
+                  onClick={() =>
+                    api(
+                      `/workspaces/${workspace.id}/projects/${id}/links`,
+                      "POST",
+                      { record_id: r.id },
+                    )
+                      .then(() => {
+                        refresh();
+                        notice("Hasil ditautkan ke proyek.");
+                        close();
+                      })
+                      .catch((e) => notice(e.message))
+                  }
+                >
+                  Tautkan
+                </button>
+              </div>
+            ))}
+        </div>
+        {search.length >= 2 && !data?.records.length && (
+          <p>
+            Belum ada catatan dengan nama itu. Simpan pekerjaan dahulu dari menu
+            Data & operasi atau Alat kerja.
+          </p>
+        )}
+      </div>
+    </Modal>
+  );
+}
+function TaskBoard(c) {
+  const { workspace, revision } = c,
+    { data, error } = useData(
+      `/workspaces/${workspace.id}/hub/tasks`,
+      revision,
+    ),
+    [edit, setEdit] = useState(false);
+  return (
+    <>
+      <Heading
+        title="Satu langkah lebih dekat."
+        description="Ubah rencana menjadi pekerjaan yang selesai. Mulai fokus untuk mencatat waktu nyata."
+      >
+        {workspace.role !== "viewer" && (
+          <button className="primary" onClick={() => setEdit(true)}>
+            <Plus size={17} />
+            Tambah tugas
+          </button>
+        )}
+      </Heading>
+      <State data={data} error={error}>
+        {data && (
+          <>
+            <TaskColumns {...c} rows={data.records} />
+            {data.truncated && (
+              <button
+                className="secondary"
+                onClick={() => c.navigate("record", "daily-apps", "tasks")}
+              >
+                Lihat tugas lainnya
+              </button>
+            )}
+          </>
+        )}
+      </State>
+      {edit && (
+        <RecordForm
+          {...c}
+          module={product.modules.find((m) => m.key === "tasks")}
+          record={{}}
+          close={() => setEdit(false)}
+          saved={() => {
+            setEdit(false);
+            c.refresh();
+          }}
+        />
+      )}
+    </>
+  );
+}
+function TaskColumns(c) {
+  const { rows, workspace, refresh, notice, openRecord } = c;
+  const move = async (r, status) => {
+    try {
+      await api(`/workspaces/${workspace.id}/records/tasks/${r.id}`, "PUT", {
+        ...r.data,
+        status,
+        version: r.version,
+      });
+      refresh();
+      notice("Status tugas diperbarui.");
+    } catch (e) {
+      notice(e.message);
+    }
+  };
+  const start = async (r) => {
+    try {
+      await api(`/workspaces/${workspace.id}/focus/start`, "POST", {
+        task_id: r.id,
+      });
+      refresh();
+      notice("Sesi fokus dimulai. Waktu dihitung server.");
+    } catch (e) {
+      notice(e.message);
+    }
+  };
+  return (
+    <div className="kanban">
+      {["todo", "doing", "done"].map((status) => (
+        <section className="kanban-column" key={status}>
+          <header>
+            <span className={"column-dot " + status} />
+            <h3>{labels[status]}</h3>
+            <span>{rows.filter((r) => r.status === status).length}</span>
+          </header>
+          {rows
+            .filter((r) => r.status === status)
+            .map((r) => (
+              <article className="task-card" key={r.id}>
+                <button
+                  className="task-title"
+                  onClick={() => openRecord({ ...r, area: "daily-apps" })}
+                >
+                  {r.title}
+                </button>
+                <p>{r.data.notes}</p>
+                <div className="task-meta">
+                  <span className="pill">{r.data.priority || "normal"}</span>
+                  <span>{date(r.data.date)}</span>
+                </div>
+                {workspace.role !== "viewer" && (
+                  <footer>
+                    <select
+                      aria-label={"Status " + r.title}
+                      value={r.status}
+                      onChange={(e) => move(r, e.target.value)}
+                    >
+                      {["todo", "doing", "done"].map((s) => (
+                        <option key={s} value={s}>
+                          {labels[s]}
+                        </option>
+                      ))}
+                    </select>
+                    {status !== "done" && (
+                      <button
+                        className="icon-button"
+                        aria-label={"Fokus " + r.title}
+                        onClick={() => start(r)}
+                      >
+                        <Play size={16} />
+                      </button>
+                    )}
+                  </footer>
+                )}
+              </article>
+            ))}
+          {!rows.some((r) => r.status === status) && (
+            <div className="kanban-empty">Belum ada tugas</div>
+          )}
+        </section>
+      ))}
+    </div>
+  );
+}
+const duration = (seconds) => {
+  const s = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(s / 3600)
+    .toString()
+    .padStart(
+      2,
+      "0",
+    )}:${Math.floor(s / 60) % 60 < 10 ? "0" : ""}${Math.floor(s / 60) % 60}:${(s % 60).toString().padStart(2, "0")}`;
+};
+function FocusStrip({ workspace, revision, refresh, notice }) {
+  const { data } = useData(`/workspaces/${workspace.id}/focus`, revision),
+    [now, setNow] = useState(Date.now()),
+    [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!data?.focus) return;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [data?.focus?.id]);
+  if (!data?.focus) return null;
+  const stop = async (complete_task) => {
+    setBusy(true);
+    try {
+      await api(`/workspaces/${workspace.id}/focus/stop`, "POST", {
+        id: data.focus.id,
+        complete_task,
+      });
+      refresh();
+      notice("Waktu fokus disimpan.");
+    } catch (e) {
+      notice(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <section className="focus-strip" aria-label="Sesi fokus aktif">
+      <span className="live-dot" />
+      <div>
+        <small>SEDANG FOKUS</small>
+        <strong>{data.focus.title}</strong>
+      </div>
+      <time>
+        {duration((now - Date.parse(data.focus.data.started_at)) / 1000)}
+      </time>
+      <button
+        className="secondary small"
+        disabled={busy}
+        onClick={() => stop(false)}
+      >
+        <Square size={14} />
+        Selesai fokus
+      </button>
+      {data.focus.data.task_id && (
+        <button
+          className="primary small"
+          disabled={busy}
+          onClick={() => stop(true)}
+        >
+          <Check size={15} />
+          Selesaikan tugas
+        </button>
+      )}
+    </section>
+  );
+}
+function Agenda(c) {
+  const [month, setMonth] = useState(localDate().slice(0, 7)),
+    { data, error } = useData(
+      `/workspaces/${c.workspace.id}/hub/agenda?month=${month}`,
+      c.revision,
+    );
+  const grouped = Object.groupBy(data?.events || [], (e) =>
+    e.date.slice(0, 10),
+  );
+  return (
+    <>
+      <Heading
+        title="Semua agenda, satu pandangan."
+        description="Tenggat proyek, jadwal layanan, kegiatan, dan tanggal pekerjaan dari data Anda."
+      />
+      <label className="month-picker">
+        Bulan
+        <input
+          type="month"
+          required
+          value={month}
+          onChange={(e) => e.target.value && setMonth(e.target.value)}
+        />
+      </label>
+      <State data={data} error={error}>
+        {data && !data.events.length ? (
+          <Empty
+            title="Bulan ini belum ada agenda"
+            description="Tanggal dari tugas dan catatan Anda akan muncul otomatis di sini."
+          />
+        ) : (
+          Object.entries(grouped).map(([day, events]) => (
+            <section className="panel agenda-day" key={day}>
+              <h2>{date(day + "T12:00:00")}</h2>
+              <div className="work-list">
+                {events.map((r, i) => (
+                  <Row
+                    key={r.id + r.label + i}
+                    record={r}
+                    openRecord={c.openRecord}
+                    extra={<span className="pill">{r.label}</span>}
+                  />
+                ))}
+              </div>
+            </section>
+          ))
+        )}
+        {data?.truncated && (
+          <p>
+            Agenda dibatasi 1.000 catatan per bulan. Gunakan pencarian untuk
+            catatan lain.
+          </p>
+        )}
+      </State>
+    </>
+  );
+}
+function Library({ navigate, tools = false }) {
+  const [q, setQ] = useState("");
+  return (
+    <>
+      <Heading
+        title={tools ? "Ruang untuk membuat." : "Jalankan pekerjaan Anda."}
+        description={
+          tools
+            ? "Alat yang bekerja dengan berkas dan data Anda. Hasilnya dapat dihubungkan ke proyek."
+            : "Satu ruang data untuk kegiatan pribadi, kreatif, dan operasional."
+        }
+      />
+      <label className="library-search">
+        <Search size={19} />
+        <input
+          aria-label={tools ? "Cari alat" : "Cari jenis data"}
+          placeholder={
+            tools ? "Cari alat kerja…" : "Cari jenis catatan atau kegiatan…"
+          }
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+      </label>
+      {tools ? (
+        <div className="tool-library">
+          {TOOLS.filter((t) =>
+            (t.title + " " + t.description)
+              .toLowerCase()
+              .includes(q.toLowerCase()),
+          ).map((t, i) => (
+            <button
+              className="panel tool-tile"
+              key={t.area + t.key}
+              onClick={() => navigate("tool", t.area, t.key)}
+            >
+              <span className="tool-number">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <ArrowUpRight size={19} />
+              <h2>{t.title}</h2>
+              <p>{t.description}</p>
+            </button>
+          ))}
+        </div>
+      ) : (
+        GROUPS.map((group) => (
+          <section className="library-group" key={group.name}>
+            <h2>{group.name}</h2>
+            <p>{group.description}</p>
+            {group.areas.map((area) => {
+              const modules = PRODUCTS[area].modules.filter(
+                (m) =>
+                  !m.tool &&
+                  (m.label + " " + AREA_LABELS[area])
+                    .toLowerCase()
+                    .includes(q.toLowerCase()),
+              );
+              return modules.length ? (
+                <details
+                  className="panel resource-section"
+                  key={area}
+                  open={q ? true : undefined}
+                >
+                  <summary>
+                    {AREA_LABELS[area]}
+                    <span>{modules.length} jenis catatan</span>
+                  </summary>
+                  {FLOWS[area] && (
+                    <div className="flow-steps">
+                      {FLOWS[area].map(([key, label]) => (
+                        <button
+                          key={key}
+                          onClick={() => navigate("record", area, key)}
+                        >
+                          {label}
+                          <ArrowRight size={14} />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="resource-links">
+                    {modules.map((m) => (
+                      <button
+                        key={m.key}
+                        onClick={() => navigate("record", area, m.key)}
+                      >
+                        {m.label}
+                        <ArrowUpRight size={14} />
+                      </button>
+                    ))}
+                  </div>
+                </details>
+              ) : null;
+            })}
+          </section>
+        ))
+      )}
+    </>
+  );
+}
+function AreaPane(c) {
+  const { area, moduleKey, workspace, revision, notice } = c,
+    { data, error } = useData(`/workspaces/${workspace.id}/areas`, revision),
+    [enabled, setEnabled] = useState(null),
+    [failure, setFailure] = useState(""),
+    [busy, setBusy] = useState(false);
+  const spec = PRODUCTS[area],
+    module = spec?.modules.find((m) => m.key === moduleKey);
+  if (!module) return <Empty title="Jenis pekerjaan tidak ditemukan" />;
+  const id = data?.areas[area] || enabled;
+  const enable = async () => {
+    setBusy(true);
+    try {
+      const d = await api(
+        `/workspaces/${workspace.id}/areas/${area}`,
+        "POST",
+        {},
+      );
+      setEnabled(d.workspace.id);
+    } catch (e) {
+      setFailure(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  if (!data || error) return <State data={data} error={error} />;
+  if (!id)
+    return (
+      <>
+        <Heading
+          title={module.label}
+          description="Bidang ini belum diaktifkan di ruang kerja ini."
+        />
+        {failure && <ErrorBox message={failure} />}
+        <Empty
+          title="Mulai bidang kerja ini"
+          description="Tidak ada data contoh yang akan ditambahkan. Semua anggota ruang memiliki akses sesuai perannya."
+          action={
+            workspace.role !== "viewer" && (
+              <button className="primary" disabled={busy} onClick={enable}>
+                Aktifkan {AREA_LABELS[area]}
+              </button>
+            )
+          }
+        />
+      </>
+    );
+  const props = {
+    ...c,
+    workspace: { ...workspace, id },
+    product: { ...spec, name: AREA_LABELS[area] },
+    module,
+    navigate: (key) => c.navigate("record", area, key),
+  };
+  return (
+    <>
+      <div className="area-context">
+        <button
+          className="text-button"
+          onClick={() => c.navigate(module.tool ? "tools" : "data")}
+        >
+          <ChevronLeft size={15} />
+          {module.tool ? "Semua alat" : "Semua data"}
+        </button>
+        <span>
+          {workspace.name} / {AREA_LABELS[area]}
+        </span>
+      </div>
+      {module.tool ? (
+        <React.Suspense fallback={<Loading />}>
+          <ToolPanel {...props} />
+        </React.Suspense>
+      ) : (
+        <Records {...props} />
+      )}
+    </>
+  );
+}
+function SearchResults(c) {
+  const { data, error } = useData(
+    `/workspaces/${c.workspace.id}/hub/search?q=${encodeURIComponent(c.query)}`,
+    c.revision,
+  );
+  return (
+    <>
+      <Heading
+        title={"Hasil untuk “" + c.query + "”"}
+        description="Pencarian nama catatan dari seluruh bidang dalam ruang kerja ini. Maksimum 50 hasil terbaru."
+      />
+      <State data={data} error={error}>
+        {data?.records.length ? (
+          <section className="panel work-list">
+            {data.records.map((r) => (
+              <Row key={r.id} record={r} openRecord={c.openRecord} />
+            ))}
+          </section>
+        ) : (
+          <Empty
+            title="Belum ditemukan"
+            description="Coba nama catatan yang lebih singkat atau periksa ruang kerja aktif Anda."
+          />
+        )}
+      </State>
+    </>
+  );
+}
+function WorkspaceReports(c) {
+  const { data, error } = useData(
+    `/workspaces/${c.workspace.id}/hub`,
+    c.revision,
+  );
+  return (
+    <>
+      <Heading
+        title="Lihat progres yang sebenarnya."
+        description="Ringkasan lintas bidang dan laporan rinci berdasarkan catatan tersimpan."
+      >
+        <button
+          className="secondary"
+          onClick={() =>
+            api(`/workspaces/${c.workspace.id}/export`)
+              .then((d) =>
+                download(
+                  "daily-workspace.json",
+                  JSON.stringify(d, null, 2),
+                  "application/json",
+                ),
+              )
+              .catch((e) => c.notice(e.message))
+          }
+        >
+          <Download size={17} />
+          Ekspor semua data
+        </button>
+      </Heading>
+      <State data={data} error={error}>
+        {data && (
+          <>
+            <div className="overview-metrics">
+              <Metric label="Catatan" value={data.total} />
+              <Metric label="Status selesai" value={data.done} />
+              <Metric label="Proyek" value={data.projects.length} />
+              <Metric
+                label="Bidang berisi data"
+                value={new Set(data.counts.map((r) => r.area)).size}
+              />
+            </div>
+            <div className="report-areas">
+              {Object.entries(AREA_LABELS).map(([area, label]) => {
+                const count = data.counts
+                  .filter((r) => r.area === area)
+                  .reduce((n, r) => n + r.count, 0);
+                return (
+                  <button
+                    className="panel report-area"
+                    key={area}
+                    onClick={() => c.navigate("tool", area, "reports")}
+                  >
+                    <BarChart3 size={20} />
+                    <span>
+                      <strong>{label}</strong>
+                      <small>{count} catatan · buka laporan terperinci</small>
+                    </span>
+                    <ArrowUpRight size={18} />
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </State>
+    </>
+  );
+}
+createRoot(document.getElementById("root")).render(<App />);

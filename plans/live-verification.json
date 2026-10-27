@@ -1,0 +1,283 @@
+{
+  "verified_at": "2026-10-27T07:59:19.688791+00:00",
+  "canonical": "https://daily-apps-app.zwart.qzz.io",
+  "endpoints": {
+    "/": {
+      "status": 200
+    },
+    "/api/health": {
+      "status": 200,
+      "payload": {
+        "ok": true,
+        "version": "3.0.0",
+        "product": "daily-apps",
+        "application": "Daily Workspace",
+        "storage": "D1",
+        "single_origin": true
+      }
+    },
+    "/api/config": {
+      "status": 200
+    },
+    "/api/auth/session": {
+      "status": 200
+    }
+  },
+  "domain_count": 50,
+  "domains": [
+    {
+      "hostname": "aquapure-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "attribution-hub-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "audiomind-studio-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "bookflow-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "carbontrack-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "clinic-os-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "clipforge-ai-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "clipforge-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "codeforgeme-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "courseforge-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "daganghub-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "daily-apps-app.zwart.qzz.io",
+      "canonical": true
+    },
+    {
+      "hostname": "farmlog-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "fieldroute-os-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "fleetmile-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "gridcraft-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "habitflow-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "habitgrid-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "hearth-os-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "invensight-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "inventa-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "lawbot-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "ledger-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "ledgerflow-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "legalbot-garuda-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "legalbotgaruda-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "mediaforge-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "menumaster-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "moodcanvas-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "motopart-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "neurotone-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "podforge-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "priceforge-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "projects-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "renderforge-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "resi-flow-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "rosari-commerce-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "routineflow-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "servora-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "shaderforge-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "socsynth-studio-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "socsynth-studio-new-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "stockgenie-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "tripforge-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "tutormind-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "voiceforge-studio-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "waconvert-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "wahagenius-crm-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "warungrosari-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    },
+    {
+      "hostname": "zwart-2026-08-31-socsynth-studio-app.zwart.qzz.io",
+      "redirect": 301,
+      "api_forwarded": true
+    }
+  ],
+  "records_unchanged": true,
+  "credential_hashes_unchanged": true,
+  "server_secret_retained": true,
+  "anonymous_sensor_post_rejected_without_redirect": true,
+  "production_seed_records": 0
+}

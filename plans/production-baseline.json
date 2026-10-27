@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-27T07:27:25.186699+00:00",
+  "counts": [
+    {
+      "kind": "users",
+      "count": 2
+    },
+    {
+      "kind": "workspaces",
+      "count": 4
+    },
+    {
+      "kind": "records",
+      "count": 2
+    },
+    {
+      "kind": "members",
+      "count": 4
+    }
+  ],
+  "workspace_count_by_product": {
+    "aquapure": 1,
+    "daganghub": 1,
+    "gridcraft": 1,
+    "stockgenie": 1
+  },
+  "production_database_unchanged": true,
+  "server_secret_present": true,
+  "time_travel_bookmark_captured": true,
+  "record_fingerprint": "da3e884f3ce3117f1b4b5a3f87da16c6a70ab6b27b8e6b8323b0340841f1ae78"
+}

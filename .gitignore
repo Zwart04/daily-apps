@@ -6,3 +6,10 @@ dist/
 .dev.vars
 *.log
 __pycache__/
+
+.recovery/
+.migration-private/
+.dev.vars*
+
+platform/wrangler.stage.json
+wrangler.stage.json

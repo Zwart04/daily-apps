@@ -1,0 +1,379 @@
+{
+  "original_archive_sha256": "cb149e1567b3538c26dfaa4b1000368d292e101e56ab3f50a1daae1ab05d5bd0",
+  "legacy_histories": 50,
+  "current_histories": 12,
+  "verified": [
+    {
+      "source": "legacy/recovery/aquapure.bundle",
+      "refs": 3,
+      "sha256": "2e67e01da648582d5f758312bbb67a9535f5a7ae3447861787428f739f5c1f37",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/attribution-hub.bundle",
+      "refs": 3,
+      "sha256": "def370b4dac84881b4b4b0e0adb795b590b3396d23b2899e595d72818ec5f6d2",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/audiomind-studio.bundle",
+      "refs": 2,
+      "sha256": "48f2fb64b10ac3aa4ca12ecb119acc9701acb55c51f4fd1e452269a50fd9e856",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/bookflow.bundle",
+      "refs": 3,
+      "sha256": "0cb6d98e77541da85e9c4f1a67f49ffe1aac838aa5bd6cd8d550275c63778141",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/carbontrack.bundle",
+      "refs": 3,
+      "sha256": "2bc85f2ade2ec04844d898282399f455032d100b4b0e14483aab230bfc9c225a",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/clinic-os.bundle",
+      "refs": 3,
+      "sha256": "71e5bdcc3690135b12a07d6afa6ca298f0b0f1a04dd97b7a2b8bfd37c369876f",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/clipforge-ai.bundle",
+      "refs": 3,
+      "sha256": "59f9d752f83896a426db6040d3f28f451a23119dd7c8b71f1642fd9960263ce2",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/clipforge.bundle",
+      "refs": 3,
+      "sha256": "cd7bf2450757627cb83265824a6f21cbd9e691d972f7dcff642d486a45ec34c3",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/codeforgeme.bundle",
+      "refs": 3,
+      "sha256": "bed90c51999c3104ada65150cda2a89bd0f8b87c8ce9778eb2dffa7770e25537",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/courseforge.bundle",
+      "refs": 3,
+      "sha256": "6661766ffac36f3c0c98b303d20ad7edf346d20379b44cee49fcafcea363318a",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/daganghub.bundle",
+      "refs": 3,
+      "sha256": "6312f7993bf1cc3a2ac19e75c983e36cf746a59ea59b22971162917456032845",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/daily-apps.bundle",
+      "refs": 3,
+      "sha256": "f5e3ca22b1160d33c651a3e82bd5c8f8e612011eec915945a2ea242e4a7f499c",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/farmlog.bundle",
+      "refs": 3,
+      "sha256": "dee9058394313009cd4b24e457e34830088c8100682032bb4536c12328795e6d",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/fieldroute-os.bundle",
+      "refs": 3,
+      "sha256": "bae682ac8693b934c81c985583bbc946630e296e65133a6d45c8028cea94bd58",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/fleetmile.bundle",
+      "refs": 3,
+      "sha256": "806d46b92567e0ba8eca6e40aa28edcc27fad74718bb82b1808fdc5c932c8ae8",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/gridcraft.bundle",
+      "refs": 3,
+      "sha256": "0e1823b6dd5bfca734bc4f236a616c456c1263c4e264bf4c9654e9d2c4a2d89a",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/habitflow.bundle",
+      "refs": 4,
+      "sha256": "7587e68bf947f951cb585f22a4b6c5ce6387273d66e5262ff3c7a2bf9cccf903",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/habitgrid.bundle",
+      "refs": 3,
+      "sha256": "39ea20c01ac0e3ddc6a50d6ecdf36a4d2649155cc9142a664fca4d9d87a63444",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/hearth-os.bundle",
+      "refs": 3,
+      "sha256": "2fbccefcc435545a5ca11e89c1adedb006564dbe3950f33df80b29f4e7498921",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/invensight.bundle",
+      "refs": 3,
+      "sha256": "0da82489b3041562b8ed046252b5cdfc6471f6531fc2387145d30da5d718a9b3",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/inventa.bundle",
+      "refs": 3,
+      "sha256": "7d0fa994ecbda89db326ec2bfeb8b77bba305e2a5996ee8e39e745d710a2dd50",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/lawbot.bundle",
+      "refs": 3,
+      "sha256": "c82645b0119767eb5463867e4cae7ac9fb85cb3d81f52fe5f5ae2d6172e83582",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/ledger.bundle",
+      "refs": 3,
+      "sha256": "84e296856484ea1868e93bc58c78ba98582903e482f9420a8aa7bbfb5916d7b2",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/ledgerflow.bundle",
+      "refs": 3,
+      "sha256": "e8ba19edda23bbce1621eaa3dd70f7a6524c79fa5c5ffba4ea096e18fbf6ce6a",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/legalbot-garuda.bundle",
+      "refs": 3,
+      "sha256": "1d383e9d26318d2bdbb5a5dc136706d756ffee5314bf60b41cc05e7e1035d506",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/legalbotgaruda.bundle",
+      "refs": 3,
+      "sha256": "3418745541d1f21099c5371b7f3f008a0cfed92fc6618835eee16d03b5930d24",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/mediaforge.bundle",
+      "refs": 2,
+      "sha256": "fd6bf439a2a8152bbcc4d1faa2af770aaba4db47453f8c8a3845dd3514b95ade",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/menumaster.bundle",
+      "refs": 3,
+      "sha256": "820b6744f53c436a3598eb0b5afb4dffce1b1fb7946c386bd6ded10cfe20a3fb",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/moodcanvas.bundle",
+      "refs": 3,
+      "sha256": "aa3e0563bcdb46e3b334d32b646349db20f6388e74818bb1af0dfbb944401789",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/motopart.bundle",
+      "refs": 3,
+      "sha256": "0d9e1a3e7aa813250a54e5da8f2ef7266e8917ec8ff4a4e1033a36d2a3fcb233",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/neurotone.bundle",
+      "refs": 3,
+      "sha256": "2798f0a70f2a0f7f706ed906f1db56f157f80ec270f2170b40202e32930077b0",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/podforge.bundle",
+      "refs": 3,
+      "sha256": "ed1ef58e6e6f98ca12abecf19652f9992976ef1204ad71916d88ceaec15476cd",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/priceforge.bundle",
+      "refs": 3,
+      "sha256": "523f350fb39f870347cdf8343292c491f2d4c7fb08ae35655ea9d88a60a793d7",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/renderforge.bundle",
+      "refs": 3,
+      "sha256": "cd418a61349b42ec2cbce12ecfc4989d9892f0963ae58048343007915270ae82",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/resi-flow.bundle",
+      "refs": 3,
+      "sha256": "75f40df0a806dab59454f4978a199c08c4d5b97ddd1ad4a9f46eb3c5c3039846",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/rosari-commerce.bundle",
+      "refs": 3,
+      "sha256": "707e98eb6421fa3d654448ed94a0e17018a1fbbad6c775597b4b9c4f0cfcf2f7",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/routineflow.bundle",
+      "refs": 3,
+      "sha256": "bdf9ddec862b4c87476543938cd5741fcb67d44c2fd971cc9aaa7e0c441528e6",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/servora.bundle",
+      "refs": 3,
+      "sha256": "e18b3b9c870eddc29f3a879bfd30f8263195ea37549c054e0cc3b271ca2a42f4",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/shaderforge.bundle",
+      "refs": 2,
+      "sha256": "7ea88e6eb3f87102878aeca96ba47e43ac11fcab2b548b11ef34297689909b4a",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/socsynth-studio-new.bundle",
+      "refs": 3,
+      "sha256": "3dba5ed8600aecf60a47409a874b9b6e2cd3a87f16cce9cefb523efe5e95db31",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/socsynth-studio.bundle",
+      "refs": 3,
+      "sha256": "db2079e038cbe4c5123ad8b03acf344b82ef23e1c6afcdcf5274b1cf426ad057",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/stockgenie.bundle",
+      "refs": 2,
+      "sha256": "907dde36b7677fde5082727128b948f26482584607394b9196e757f943d0b194",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/tripforge.bundle",
+      "refs": 3,
+      "sha256": "d8c8cbb125bd7723cd9ef7769d2f1f3b83e1e49a5fc0cb508a282a5295ed4b10",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/tutormind.bundle",
+      "refs": 3,
+      "sha256": "47c126e09bafcd271d49462729845155df86e25d7fd2a9633bd4ff9637bfb01f",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/voiceforge-studio.bundle",
+      "refs": 3,
+      "sha256": "6e2166642ead93e0b481297c1297dbbdeabb76438bd7a0dd33017fdf11168ef4",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/waconvert.bundle",
+      "refs": 3,
+      "sha256": "f8d8133170d2f5f556f5eac6914f76772510c621ce4c98ee5a8baa3445b9fd79",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/wahagenius-crm.bundle",
+      "refs": 3,
+      "sha256": "989cd0f985be06763771079659c04d3ee76a693b9c1188bdd0e3d838653ee8c0",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/warungrosari.bundle",
+      "refs": 3,
+      "sha256": "f0b7d2935d20a85ef365e2a7b1a0e49a363f3cf9556b66ac57b316366a7151a4",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/zwart-2026-08-31-socsynth-studio.bundle",
+      "refs": 3,
+      "sha256": "a7175c8c759a3d2731434e3c561618e48f9bb4573e30c69c29e89869ed4f30a8",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "legacy/recovery/zwart04-projects.bundle",
+      "refs": 2,
+      "sha256": "21d91fbd315ccdfa82b9e1abf97a797339c8fc4445dfcaed08c866efcec527c1",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/daily-apps",
+      "refs": 3,
+      "sha256": "c29df1d732b4406100105176f71274414b6a47207d78821ee7cda521243bd469",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/zwart04-projects",
+      "refs": 4,
+      "sha256": "e5f55bc1e8766b66a2f57b92b08c27c7d1bf28fab5f23cf532e6b212550955b6",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/daganghub",
+      "refs": 3,
+      "sha256": "58eda12b6c1db93ed7729fd0613addec8d4c7224cd0e2c6060a6d2cd3bab6624",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/renderforge",
+      "refs": 3,
+      "sha256": "fd90ef2e970ccaf17776265e0b56afd9db07ec8338157bba3e95bbcb4f37a244",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/tutormind",
+      "refs": 3,
+      "sha256": "1fcc37042b59498aae54f7ffeafde7573d655efd20e09c1032d9ca7359844f91",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/servora",
+      "refs": 3,
+      "sha256": "70f8dc4c0f6785d293258d950b69550d95ba4abec444b5fdd80511748cea732b",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/aquapure",
+      "refs": 3,
+      "sha256": "a0c496d5af9d59b59905ea7605b62b6f4e42e699c0694b96472c45a1059e037d",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/clinic-os",
+      "refs": 3,
+      "sha256": "55ae9ff34f7b01d967da1a0a8ce1e0d45a07c58c906da6424c29508cfd5afa4e",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/legalbot-garuda",
+      "refs": 3,
+      "sha256": "70e70ec577a7a3e94447cd0dce2c0fbbe26dc8ca37342d171f03c89730f389ee",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/codeforgeme",
+      "refs": 3,
+      "sha256": "d47445fb6a9de476da444b2c9364cac3b1e443d55b25b497499cdb3cabe106b3",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/gridcraft",
+      "refs": 3,
+      "sha256": "073e0ef5ef9b9a4aafae31fafb8ad5b33d3a53646d2cb155118dd0ad09fd8876",
+      "restored_and_fsck": true
+    },
+    {
+      "source": "Zwart04/stockgenie",
+      "refs": 3,
+      "sha256": "717e5ae9f326566b69f985c866bc0755fcc8cfb5d36cf69d072f92285a822620",
+      "restored_and_fsck": true
+    }
+  ]
+}

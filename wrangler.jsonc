@@ -3,7 +3,7 @@
   "account_id": "06403b9ad7c7c150d97e34aad884419d",
   "main": "platform/proxy.js",
   "compatibility_date": "2026-10-03",
-  "workers_dev": true,
+  "workers_dev": false,
   "vars": {
     "PRODUCT": "daily-apps",
     "CANONICAL_HOST": "daily-apps-app.zwart.qzz.io"
@@ -22,7 +22,67 @@
   },
   "routes": [
     {
+      "pattern": "aquapure-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "attribution-hub-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "audiomind-studio-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "bookflow-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "carbontrack-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "clinic-os-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "clipforge-ai-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "clipforge-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "codeforgeme-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "courseforge-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "daganghub-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
       "pattern": "daily-apps-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "farmlog-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "fieldroute-os-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "fleetmile-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "gridcraft-app.zwart.qzz.io",
       "custom_domain": true
     },
     {
@@ -34,15 +94,131 @@
       "custom_domain": true
     },
     {
-      "pattern": "routineflow-app.zwart.qzz.io",
-      "custom_domain": true
-    },
-    {
       "pattern": "hearth-os-app.zwart.qzz.io",
       "custom_domain": true
     },
     {
+      "pattern": "invensight-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "inventa-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "lawbot-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "ledger-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "ledgerflow-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "legalbot-garuda-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "legalbotgaruda-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "mediaforge-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "menumaster-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "moodcanvas-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "motopart-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "neurotone-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "podforge-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "priceforge-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "projects-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "renderforge-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "resi-flow-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "rosari-commerce-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "routineflow-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "servora-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "shaderforge-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "socsynth-studio-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "socsynth-studio-new-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "stockgenie-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
       "pattern": "tripforge-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "tutormind-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "voiceforge-studio-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "waconvert-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "wahagenius-crm-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "warungrosari-app.zwart.qzz.io",
+      "custom_domain": true
+    },
+    {
+      "pattern": "zwart-2026-08-31-socsynth-studio-app.zwart.qzz.io",
       "custom_domain": true
     }
   ]
