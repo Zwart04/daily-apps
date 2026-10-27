@@ -1,6 +1,6 @@
 {
-  "verified_at": "2026-10-27T08:05:24.732242+00:00",
-  "canonical": "https://daily-apps-app.zwart.qzz.io",
+  "verified_at": "2026-10-27T08:41:25.715944+00:00",
+  "canonical": "https://apps.zwart.my.id",
   "endpoints": {
     "/": {
       "status": 200
@@ -23,7 +23,7 @@
       "status": 200
     }
   },
-  "domain_count": 50,
+  "domain_count": 51,
   "domains": [
     {
       "hostname": "aquapure-app.zwart.qzz.io",
@@ -82,7 +82,8 @@
     },
     {
       "hostname": "daily-apps-app.zwart.qzz.io",
-      "canonical": true
+      "redirect": 301,
+      "api_forwarded": true
     },
     {
       "hostname": "farmlog-app.zwart.qzz.io",
@@ -273,6 +274,10 @@
       "hostname": "zwart-2026-08-31-socsynth-studio-app.zwart.qzz.io",
       "redirect": 301,
       "api_forwarded": true
+    },
+    {
+      "hostname": "apps.zwart.my.id",
+      "canonical": true
     }
   ],
   "records_unchanged": true,

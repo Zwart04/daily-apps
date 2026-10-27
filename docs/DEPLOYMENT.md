@@ -2,6 +2,8 @@
 
 ## Produksi
 
+Alamat utama: **https://apps.zwart.my.id/**. Alias lama di `zwart.qzz.io` tetap mengarahkan halaman ke domain ini; endpoint API tetap diteruskan tanpa mengubah metode request. Cookie login terikat origin, jadi pengguna masuk ulang sekali saat berpindah domain.
+
 Konfigurasi frontend: `wrangler.jsonc`. Backend privat: `platform/wrangler.jsonc`. Periksa account ID, domain, service binding, dan ID D1 sebelum menjalankan perintah.
 
 ```sh

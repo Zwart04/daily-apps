@@ -1,0 +1,15 @@
+{
+  "verified_at": "2026-10-27T08:42:48.685932+00:00",
+  "canonical": "https://apps.zwart.my.id",
+  "previous_canonical": "https://daily-apps-app.zwart.qzz.io",
+  "old_aliases_redirecting": 50,
+  "https_verified": true,
+  "entry_assets_match_production_build": true,
+  "old_api_post_preserved": true,
+  "existing_dns_conflicts": 0,
+  "existing_records_overwritten": false,
+  "production_records_unchanged": true,
+  "credential_hashes_unchanged": true,
+  "database_and_backend_replaced": false,
+  "login_again_once_on_new_origin": true
+}

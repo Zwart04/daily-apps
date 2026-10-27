@@ -2,7 +2,7 @@
 
 Satu aplikasi untuk merencanakan proyek, mengerjakan tugas, membuat karya, dan menjalankan operasi. Seluruh fitur menggunakan satu akun dan satu alamat:
 
-**[Buka Daily Workspace](https://daily-apps-app.zwart.qzz.io/)**
+**[Buka Daily Workspace](https://apps.zwart.my.id/)**
 
 ## Alur penggunaan
 

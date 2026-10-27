@@ -1,6 +1,8 @@
 # Penggabungan selesai
 
-Aplikasi: https://daily-apps-app.zwart.qzz.io/
+Aplikasi: https://apps.zwart.my.id/
+
+Domain diperbarui atas permintaan pengguna; seluruh 50 alamat lama di `zwart.qzz.io` kini menjadi alias. Akun, data, dan backend tetap sama.
 Repo tunggal: https://github.com/Zwart04/daily-apps
 Recovery: https://github.com/Zwart04/daily-apps/releases/tag/workspace-consolidation-backup
 

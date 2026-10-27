@@ -1,7 +1,10 @@
-import json,urllib.request,urllib.error,hashlib,datetime
+import json,urllib.request,urllib.error,hashlib,datetime,argparse
 from concurrent.futures import ThreadPoolExecutor
 from cloudflare_access import ROOT,ACCOUNT,PRODUCTION_DB,api,query
-canonical='https://daily-apps-app.zwart.qzz.io'
+config=json.loads((ROOT/'wrangler.jsonc').read_text())
+canonical_host=config['vars']['CANONICAL_HOST']
+canonical='https://'+canonical_host
+parser=argparse.ArgumentParser();parser.add_argument('--baseline',default='.migration-private/production-before.json');args=parser.parse_args()
 class NoRedirect(urllib.request.HTTPRedirectHandler):
  def redirect_request(self,*args):return None
 opener=urllib.request.build_opener(NoRedirect)
@@ -19,18 +22,18 @@ for path in ['/','/api/health','/api/config','/api/auth/session']:
   if path=='/api/config':assert len(j['areas'])==11
   if path=='/api/auth/session':assert j['user'] is None
  if path=='/api/health':results[path]['payload']=j
-before=json.loads((ROOT/'.migration-private/production-before.json').read_text())
-expected=json.loads((ROOT/'plans/domain-migration.json').read_text())['aliases']
+before=json.loads((ROOT/args.baseline).read_text())
+expected=[r['pattern'] for r in config['routes'] if r.get('custom_domain')]
 def check(host):
- if host=='daily-apps-app.zwart.qzz.io':return {'hostname':host,'canonical':True}
+ if host==canonical_host:return {'hostname':host,'canonical':True}
  status,h,b=fetch('https://'+host+'/?from=legacy');assert status==301,(host,status);assert h.get('Location')==canonical+'/?from=legacy',(host,h)
  status,h,b=fetch('https://'+host+'/api/health');assert status==200 and json.loads(b).get('single_origin'),(host,status)
  return {'hostname':host,'redirect':301,'api_forwarded':True}
 with ThreadPoolExecutor(max_workers=5) as pool:domains=list(pool.map(check,expected))
 # Ingestion without a key must reach the backend and reject auth, not redirect or drop POST.
 status,h,b=fetch('https://aquapure-app.zwart.qzz.io/api/ingest','POST',b'{}',{'Content-Type':'application/json'});assert status==401 and 'Location' not in h
-state=query(PRODUCTION_DB,'SELECT id,workspace_id,kind,data,status,version,deleted_at FROM records ORDER BY id');assert state==before['record_state']
-credentials=query(PRODUCTION_DB,'SELECT id,password_hash,recovery_hash FROM users ORDER BY id');assert credentials==before['users']
+state=query(PRODUCTION_DB,'SELECT id,workspace_id,kind,data,status,version,deleted_at FROM records ORDER BY id');assert state==before.get('record_state',before.get('records'))
+credentials=query(PRODUCTION_DB,'SELECT id,password_hash,recovery_hash FROM users ORDER BY id');assert credentials==before.get('users',before.get('credentials'))
 settings=api(f'accounts/{ACCOUNT}/workers/scripts/zwart04-platform-v2/settings');assert any(b['name']=='PEPPER' and b['type']=='secret_text' for b in settings['bindings'])
 report={'verified_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'canonical':canonical,'endpoints':results,'domain_count':len(domains),'domains':domains,'records_unchanged':True,'credential_hashes_unchanged':True,'server_secret_retained':True,'anonymous_sensor_post_rejected_without_redirect':True,'production_seed_records':0}
 (ROOT/'plans/live-verification.json').write_text(json.dumps(report,indent=2));print('Live HTTPS verified for all',len(domains),'domains; production records and credentials unchanged.',flush=True)

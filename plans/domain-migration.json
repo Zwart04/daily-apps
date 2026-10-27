@@ -1,7 +1,8 @@
 {
-  "canonical": "daily-apps-app.zwart.qzz.io",
+  "canonical": "apps.zwart.my.id",
   "worker": "zwart04-daily-apps",
   "aliases": [
+    "apps.zwart.my.id",
     "aquapure-app.zwart.qzz.io",
     "attribution-hub-app.zwart.qzz.io",
     "audiomind-studio-app.zwart.qzz.io",
@@ -53,5 +54,5 @@
     "warungrosari-app.zwart.qzz.io",
     "zwart-2026-08-31-socsynth-studio-app.zwart.qzz.io"
   ],
-  "count": 50
+  "count": 51
 }

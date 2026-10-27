@@ -6,7 +6,7 @@
   "workers_dev": false,
   "vars": {
     "PRODUCT": "daily-apps",
-    "CANONICAL_HOST": "daily-apps-app.zwart.qzz.io"
+    "CANONICAL_HOST": "apps.zwart.my.id"
   },
   "services": [
     {
@@ -220,6 +220,11 @@
     {
       "pattern": "zwart-2026-08-31-socsynth-studio-app.zwart.qzz.io",
       "custom_domain": true
+    },
+    {
+      "pattern": "apps.zwart.my.id",
+      "custom_domain": true,
+      "zone_id": "a2492db1c54ddfee8249eb1585d6a102"
     }
   ]
 }
