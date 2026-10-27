@@ -1,4 +1,4 @@
-import json,subprocess,os
+import json,subprocess,os,sys
 from repository_safety import ROOT,guard,api,git,ENV
 meta=guard('daily-apps');remote=api('repos/Zwart04/daily-apps/commits/'+meta['default_branch'])['sha'];assert remote==git(ROOT,'rev-parse','HEAD'),'Remote head changed; reconcile before pushing'
 tracked=subprocess.check_output(['git','status','--short'],cwd=ROOT,text=True);assert '.migration-private' not in tracked and '.recovery' not in tracked
@@ -10,7 +10,7 @@ assert not any(f in ['wrangler.stage.json','platform/wrangler.stage.json'] for f
 ident=subprocess.run(['git','var','GIT_AUTHOR_IDENT'],cwd=ROOT,env=ENV,capture_output=True,text=True)
 commit_env=dict(ENV)
 if ident.returncode:commit_env.update(GIT_AUTHOR_NAME='Codex',GIT_AUTHOR_EMAIL='codex@openai.com',GIT_COMMITTER_NAME='Codex',GIT_COMMITTER_EMAIL='codex@openai.com')
-subprocess.run(['git','commit','-m','Unify all products into Daily Workspace with one login and preserved data'],cwd=ROOT,env=commit_env,check=True)
+subprocess.run(['git','commit','-m',sys.argv[1] if len(sys.argv)>1 else 'Unify all products into Daily Workspace with one login and preserved data'],cwd=ROOT,env=commit_env,check=True)
 subprocess.run(['git','push','origin','HEAD:'+meta['default_branch']],cwd=ROOT,env=ENV,check=True)
 head=git(ROOT,'rev-parse','HEAD');assert api('repos/Zwart04/daily-apps/commits/'+meta['default_branch'])['sha']==head
 print('SOURCE_PUBLISHED',head,flush=True)

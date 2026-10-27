@@ -1,0 +1,16 @@
+{
+  "source_backup": "/home/zwart/Unduhan/Backup/Daily-Workspace-2026-10-27/zwart04-workspace-recovery-2026-10-27.zip",
+  "source_backup_sha256": "adedff8e98249891d941625ab656da97b55109687c0ad8f33c228b96109f9fd0",
+  "removed_task_directories": [
+    "/home/zwart/Unduhan/Coding AI/Daily Workspace/.recovery",
+    "/home/zwart/Unduhan/Coding AI/Daily Workspace/.migration-private/browser-qa",
+    "/home/zwart/Unduhan/Coding AI/Zwart Workspace",
+    "/home/zwart/Unduhan/Coding AI/.zwart-workspace-legacy",
+    "/home/zwart/.cache/ms-playwright/chromium-1248",
+    "/home/zwart/.cache/ms-playwright/chromium_headless_shell-1248",
+    "/home/zwart/.cache/ms-playwright/ffmpeg-1013"
+  ],
+  "canonical_checkout_preserved": "/home/zwart/Unduhan/Coding AI/Daily Workspace",
+  "private_production_snapshot_retained": true,
+  "user_projects_outside_task_removed": false
+}

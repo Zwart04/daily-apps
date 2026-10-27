@@ -55,4 +55,4 @@ Anggota satu ruang memiliki akses ke seluruh bidangnya sesuai peran. Gunakan rua
 
 ## Riwayat dan backup source
 
-Repo ini menggantikan katalog dan sepuluh repo produk lama. Recovery release pada repo ini menyimpan arsip lama dengan 50 riwayat Git serta 12 snapshot sebelum penggabungan, metadata repo, checksum, dan laporan uji restore. Ini adalah snapshot yang sebagian saling beririsan, bukan 62 repo berbeda. Seluruh snapshot diuji dengan clone dan `git fsck` sebelum penghapusan repo sumber. Data pengguna tetap berada pada D1 yang sama; source archive publik tidak memuat database produksi.
+Repo ini menggantikan katalog dan sepuluh repo produk lama. [Recovery release](https://github.com/Zwart04/daily-apps/releases/tag/workspace-consolidation-backup) pada repo ini menyimpan arsip lama dengan 50 riwayat Git serta 12 snapshot sebelum penggabungan, metadata repo, checksum, dan laporan uji restore. Ini adalah snapshot yang sebagian saling beririsan, bukan 62 repo berbeda. Seluruh snapshot diuji dengan clone dan `git fsck` sebelum penghapusan repo sumber. Data pengguna tetap berada pada D1 yang sama; source archive publik tidak memuat database produksi.

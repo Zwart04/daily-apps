@@ -1,0 +1,21 @@
+{
+  "removed_worker_ids": [
+    "zwart04-projects",
+    "zwart04-daganghub",
+    "zwart04-renderforge",
+    "zwart04-tutormind",
+    "zwart04-servora",
+    "zwart04-aquapure",
+    "zwart04-clinic-os",
+    "zwart04-legalbot-garuda",
+    "zwart04-codeforgeme",
+    "zwart04-gridcraft",
+    "zwart04-stockgenie",
+    "daily-workspace-stage",
+    "daily-workspace-stage-api"
+  ],
+  "staging_database_deleted": true,
+  "production_database_retained": true,
+  "production_backend_retained": true,
+  "unrelated_resources_removed": false
+}

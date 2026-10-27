@@ -1,0 +1,73 @@
+{
+  "deleted_at": "2026-10-27T08:04:41.743518+00:00",
+  "canonical": "Zwart04/daily-apps",
+  "recovery_release": "https://github.com/Zwart04/daily-apps/releases/tag/workspace-consolidation-backup",
+  "repositories": [
+    {
+      "repository": "Zwart04/daganghub",
+      "id": 1344300980,
+      "verified_http_status": 404,
+      "backup_head": "fde2fa0182d10f1dc3e8f5ad913bda6f37e44a94"
+    },
+    {
+      "repository": "Zwart04/renderforge",
+      "id": 1375524602,
+      "verified_http_status": 404,
+      "backup_head": "590ecf3e836ddd170352589132bc036b8fe39fc8"
+    },
+    {
+      "repository": "Zwart04/tutormind",
+      "id": 1356521378,
+      "verified_http_status": 404,
+      "backup_head": "ca1f18cfddf8c2411821d47b7fc9f3e7fbba0d0d"
+    },
+    {
+      "repository": "Zwart04/servora",
+      "id": 1349228091,
+      "verified_http_status": 404,
+      "backup_head": "b986b78d5a6e194ccb0934d557481c4c80a2e74e"
+    },
+    {
+      "repository": "Zwart04/aquapure",
+      "id": 1358627199,
+      "verified_http_status": 404,
+      "backup_head": "754a07f759d5ae23bc838b006bb76fa5d7d4bb4a"
+    },
+    {
+      "repository": "Zwart04/clinic-os",
+      "id": 1350107140,
+      "verified_http_status": 404,
+      "backup_head": "bd84e8b5874ec3907c1eef90aba62859add4deed"
+    },
+    {
+      "repository": "Zwart04/legalbot-garuda",
+      "id": 1352020928,
+      "verified_http_status": 404,
+      "backup_head": "0024a5c532b56c0cf69af0513aa2aa286475b908"
+    },
+    {
+      "repository": "Zwart04/codeforgeme",
+      "id": 1373950012,
+      "verified_http_status": 404,
+      "backup_head": "d1694c6e7097ad6deed1faed166501d9e63eb0a5"
+    },
+    {
+      "repository": "Zwart04/gridcraft",
+      "id": 1370978050,
+      "verified_http_status": 404,
+      "backup_head": "8224e0735f60d3a96df698904d5cde73833c1ed9"
+    },
+    {
+      "repository": "Zwart04/stockgenie",
+      "id": 1351298500,
+      "verified_http_status": 404,
+      "backup_head": "a6f10726ad82f983111c02511d0da9a1b41a086c"
+    },
+    {
+      "repository": "Zwart04/zwart04-projects",
+      "id": 1403182228,
+      "verified_http_status": 404,
+      "backup_head": "dcadd29202efd27a4c1dd123e24d2b8300edb974"
+    }
+  ]
+}
